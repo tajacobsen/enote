@@ -4,11 +4,11 @@ from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 
 class Note:
-    def __init__(self, title, guid, notebook_name, notebook_guid, content):
+    def __init__(self, title, guid, notebook_name, tags, content):
         self.title = title
         self.guid = guid
         self.notebook_name = notebook_name
-        self.notebook_guid = notebook_guid
+        self.tags = tags
         self.content = content
 
     def write(self, basedir):
@@ -26,10 +26,12 @@ class Note:
                 os.mkdir(subpath)
 
         f = io.open(outdir + "/" + self.title + ".txt", "w")
+        for tag in self.tags:
+            f.write(unicode("TAG: %s\n" % (tag,)))
+        f.write(unicode("TITLE: %s\n" % (self.title,)))
         f.write(unicode(self.content))
-        f.write(u"\n")
+        f.write(unicode("\n"))
         f.close()
-        #print self.notebook_name + "/" + self.title
 
 class ENote:
     def __init__(self, auth_token):
@@ -43,6 +45,10 @@ class ENote:
 
         self.notes = []
 
+        self.tags = {}
+        for tag in self.note_store.listTags():
+            self.tags[tag.guid] = tag.name
+
     def getNotes(self, notebook=None, tag=None):
         #TODO: fix to include notebook
         #notebookGuid = 
@@ -51,34 +57,20 @@ class ENote:
 
         offset = 0
         max_notes = 10
-        result_spec = NotesMetadataResultSpec(includeTitle=True, includeUpdated=True, includeNotebookGuid=True)
+        result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
         result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, max_notes, result_spec)
         for note in result_list.notes:
+            if note.tagGuids is not None:
+                tags = [self.tags[tag] for tag in note.tagGuids]
+            else:
+                tags = []
             self.notes.append(Note(
                 note.title,
                 note.guid,
                 self.notebooks[note.notebookGuid],
-                note.notebookGuid,
+                tags,
                 self.note_store.getNoteContent(self.auth_token, note.guid)
                 ))
-
-        
-#user_store = client.get_user_store()
-#user = user_store.getUser()
-#print user.username
-
-#note_store = client.get_note_store()
-
-#for notebook in notebooks:
-#    print notebook.name
-#    print notebook.guid
-
-#tags = note_store.listTags()
-#for tag in tags:
-#    print tag.name
-
-# notebookGuid = xxx
-
 
 
 if __name__ == "__main__":

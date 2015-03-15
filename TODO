@@ -5,7 +5,11 @@ TODO:
 - setup.py
 - create PKGBUILD
 - argparse (for parsing argumetnts)
-
+- xhtml -> txt
+- download attachments
+- what to do about ugly notebook or note names (i.e. not valid on file system)
+- only dl listed notebooks / notes
+- only dl since some date
 ---
 
 Dependencies:
@@ -13,21 +17,7 @@ Dependencies:
 - python2-oauth2
 - python2-thrift => Have to use the one provided by evernote!!
 
-Design:
-    * Notebook = folder
-    * Note = file. #conflicts?
-    * Attachment(s) put in sub- folder with name of note
-    * Download everything, dl listed notebooks, dl listed notes
-    * Download only newer versions (based on mtime)
-
 Cli
     * enote pull [notebook] [note]
     * enote init
     * enote list
-
-
-Considerations:
-    * How to backup tags (and other meta data)
-    * Learn from geeknote, geeknote-improved
-    * Installable? (Should be easy)
-    * Strip special characters..
