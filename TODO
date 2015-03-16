@@ -1,7 +1,5 @@
 TODO:
-- Create user config in $HOME/.config/enote (dev_token + base dir)
 - xhtml -> txt
-- Use personal dev token auth (https://github.com/virantha/pypdfocr
 - Decide name of "executable" and create setup.py
 - create PKGBUILD for arch
 

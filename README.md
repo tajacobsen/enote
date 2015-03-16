@@ -9,6 +9,7 @@ Installation
 ## Dependencies:
 * evernote-sdk-python
 * python2-oauth2
+* python2-beautifulsoup4
 
 ## Configuration:
 Create a configuration file named $HOME/.config/enote.cfg with the following content:

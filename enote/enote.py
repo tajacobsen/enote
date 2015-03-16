@@ -1,8 +1,14 @@
 #!/usr/bin/env python2
 import os, io, sys
+# Requred as evernote notes are unicode
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 import ConfigParser
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
+
+from enmltohtml import ENMLToHTML
 
 config_file = "$HOME/.config/enote.cfg"
 
@@ -33,16 +39,29 @@ class Note:
         f.close()
 
     def pprint(self, f=sys.stdout, fmt="txt"):
-        f.write(unicode("TITLE: %s\n" % (self.title,)))
-        for tag in self.tags:
-            f.write(unicode("TAG: %s\n" % (tag,)))
-        f.write(unicode(self.content))
-        f.write(unicode("\n"))
+        if fmt == "enml":
+            f.write(u"<!--TITLE: %s-->\n" % (self.title,))
+            for tag in self.tags:
+                f.write(u"<!--TAG: %s-->\n" % (tag,))
+            f.write(unicode(self.content))
+            f.write(u"\n")
+        elif fmt == "html":
+            f.write(u"<!--TITLE: %s-->\n" % (self.title,))
+            for tag in self.tags:
+                f.write(u"<!--TAG: %s-->\n" % (tag,))
+            f.write(unicode(ENMLToHTML(self.content)))
+            f.write(u"\n")
+        elif fmt == "txt":
+            f.write(u"TITLE: %s\n" % (self.title,))
+            for tag in self.tags:
+                f.write(u"TAG: %s\n" % (tag,))
+            f.write(unicode(self.content))
+            f.write(u"\n")
 
 class ENote:
     def __init__(self, auth_token):
         self.auth_token = auth_token
-        self.client = EvernoteClient(token = auth_token)
+        self.client = EvernoteClient(token = auth_token, sandbox = True)
         self.note_store = self.client.get_note_store()
 
         self.notebooks = {}
@@ -87,4 +106,4 @@ if __name__ == "__main__":
     enote = ENote(access_token)
     enote.getNotes()
     for note in enote.notes:
-        note.pprint()
+        note.pprint(fmt="html")
