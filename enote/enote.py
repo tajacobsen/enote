@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# Copyright (c) 2015 Troels Kofoed Jacobsen
 import os, io, sys
 # Requred as evernote notes are unicode
 reload(sys)
@@ -8,7 +9,8 @@ import ConfigParser
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 
-from enmltohtml import ENMLToHTML
+from enmltohtml import enmltohtml
+from tools import htmltotxt
 
 config_file = "$HOME/.config/enote.cfg"
 
@@ -49,13 +51,13 @@ class Note:
             f.write(u"<!--TITLE: %s-->\n" % (self.title,))
             for tag in self.tags:
                 f.write(u"<!--TAG: %s-->\n" % (tag,))
-            f.write(unicode(ENMLToHTML(self.content)))
+            f.write(unicode(enmltohtml(self.content)))
             f.write(u"\n")
         elif fmt == "txt":
             f.write(u"TITLE: %s\n" % (self.title,))
             for tag in self.tags:
                 f.write(u"TAG: %s\n" % (tag,))
-            f.write(unicode(self.content))
+            f.write(unicode(htmltotxt(enmltohtml(self.content))))
             f.write(u"\n")
 
 class ENote:
@@ -106,4 +108,4 @@ if __name__ == "__main__":
     enote = ENote(access_token)
     enote.getNotes()
     for note in enote.notes:
-        note.pprint(fmt="html")
+        note.pprint(fmt="txt")

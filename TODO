@@ -1,5 +1,5 @@
 TODO:
-- xhtml -> txt
+- html -> txt
 - Decide name of "executable" and create setup.py
 - create PKGBUILD for arch
 
@@ -22,6 +22,5 @@ CLI
     * enote print [tag]
     * enote list [notebook] [tag]
 
-XHTML -> HTML -> TXT
 - https://github.com/CarlLee/ENML_PY (ENML -> html)
 - https://github.com/aaronsw/html2text (html -> txt)

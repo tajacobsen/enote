@@ -1,6 +1,7 @@
-#!/bin/python
+#!/bin/bin/env python2
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 CarlLee 
+# Copyright (c) 2015 Troels Kofoed Jacobsen
 # Thanks to CarlLee for providing this file under the MIT license
 # https://github.com/CarlLee/ENML_PY
 import os
@@ -12,7 +13,7 @@ MIME_TO_EXTESION_MAPPING = {
     'image/gif': '.gif'
 }
 
-def ENMLToHTML(content, pretty=True, header=True, **kwargs):
+def enmltohtml(content, pretty=True, header=True, **kwargs):
     """
     converts ENML string into HTML string
 
