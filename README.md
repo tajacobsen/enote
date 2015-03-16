@@ -9,3 +9,10 @@ Installation
 ## Dependencies:
 * evernote-sdk-python
 * python2-oauth2
+
+## Configuration:
+Create a configuration file named $HOME/.config/enote.cfg with the following content:
+
+    [enote]
+    token = XXX
+    basedir = $HOME/enote

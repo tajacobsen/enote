@@ -4,7 +4,7 @@ import ConfigParser
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 
-import config 
+config_file = "$HOME/.config/enote.cfg"
 
 class Note:
     def __init__(self, title, guid, notebook_name, tags, content):
@@ -80,8 +80,8 @@ class ENote:
 
 if __name__ == "__main__":
     config = ConfigParser.ConfigParser()
-    config.read("config.cfg")
-    basedir = config.get("enote", "basedir") 
+    config.read(os.path.expandvars(config_file))
+    basedir = os.path.expandvars(config.get("enote", "basedir"))
     access_token = config.get("enote", "token")
 
     enote = ENote(access_token)

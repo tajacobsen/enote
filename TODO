@@ -5,7 +5,7 @@ TODO:
 - Decide name of "executable" and create setup.py
 - create PKGBUILD for arch
 
-TODO next:
+TODO:
 - argparse for parsing argumetnts - see CLI below
 - download attachments (folder of same name than note)
 - what to do about ugly notebook or note names (i.e. not valid on file system)
