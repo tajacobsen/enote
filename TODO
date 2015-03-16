@@ -1,17 +1,17 @@
 TODO:
-- pretty print of note (Note.print())
-- proper use of config.py (look at geeknote)
-- Create config in $HOME/.config/enote (dev_token + base dir)
+- Create user config in $HOME/.config/enote (dev_token + base dir)
+- xhtml -> txt
 - Use personal dev token auth (https://github.com/virantha/pypdfocr
 - Decide name of "executable" and create setup.py
-- xhtml -> txt
 - create PKGBUILD for arch
+
+TODO next:
 - argparse for parsing argumetnts - see CLI below
 - download attachments (folder of same name than note)
 - what to do about ugly notebook or note names (i.e. not valid on file system)
 - only dl listed notebooks / notes
 - only dl since some date
-- command line switch to print txt or enml or html (if not txt, don't use "TAG: " as we do now)
+- command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
 ---
 
 Dependencies:
@@ -25,4 +25,5 @@ CLI
     * enote list [notebook] [tag]
 
 XHTML -> HTML -> TXT
-- https://github.com/CarlLee/ENML_PY (ENML -> TXT)
+- https://github.com/CarlLee/ENML_PY (ENML -> html)
+- https://github.com/aaronsw/html2text (html -> txt)

@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
-import os, io
+import os, io, sys
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
+
+import config 
 
 class Note:
     def __init__(self, title, guid, notebook_name, tags, content):
@@ -26,17 +28,20 @@ class Note:
                 os.mkdir(subpath)
 
         f = io.open(outdir + "/" + self.title + ".txt", "w")
+        self.pprint(f)
+        f.close()
+
+    def pprint(self, f=sys.stdout, fmt="txt"):
+        f.write(unicode("TITLE: %s\n" % (self.title,)))
         for tag in self.tags:
             f.write(unicode("TAG: %s\n" % (tag,)))
-        f.write(unicode("TITLE: %s\n" % (self.title,)))
         f.write(unicode(self.content))
         f.write(unicode("\n"))
-        f.close()
 
 class ENote:
     def __init__(self, auth_token):
         self.auth_token = auth_token
-        self.client = EvernoteClient(token=dev_token)
+        self.client = EvernoteClient(token = auth_token)
         self.note_store = self.client.get_note_store()
 
         self.notebooks = {}
@@ -72,12 +77,11 @@ class ENote:
                 self.note_store.getNoteContent(self.auth_token, note.guid)
                 ))
 
-
 if __name__ == "__main__":
     basedir = "/home/tkjacobsen/enote"
-    dev_token = "S=s1:U=9085b:E=15374ebb74a:C=14c1d3a8a30:P=1cd:A=en-devtoken:V=2:H=7e6bc64bcc94d790eff5760cb6257bd7"
-    enote = ENote(dev_token)
+    access_token = config.dev_token
+
+    enote = ENote(access_token)
     enote.getNotes()
     for note in enote.notes:
-        note.write(basedir)
-
+        note.pprint()
