@@ -1,15 +1,17 @@
 TODO:
-- Authetentication (need api key etc)
-- Push to github
-- Write README
-- setup.py
-- create PKGBUILD
-- argparse (for parsing argumetnts)
+- pretty print of note (Note.print())
+- proper use of config.py (look at geeknote)
+- Create config in $HOME/.config/enote (dev_token + base dir)
+- Use personal dev token auth (https://github.com/virantha/pypdfocr
+- Decide name of "executable" and create setup.py
 - xhtml -> txt
-- download attachments
+- create PKGBUILD for arch
+- argparse for parsing argumetnts - see CLI below
+- download attachments (folder of same name than note)
 - what to do about ugly notebook or note names (i.e. not valid on file system)
 - only dl listed notebooks / notes
 - only dl since some date
+- command line switch to print txt or enml or html (if not txt, don't use "TAG: " as we do now)
 ---
 
 Dependencies:
@@ -17,7 +19,10 @@ Dependencies:
 - python2-oauth2
 - python2-thrift => Have to use the one provided by evernote!!
 
-Cli
-    * enote pull [notebook] [note]
-    * enote init
-    * enote list
+CLI
+    * enote pull [notebook] [tag]
+    * enote print [tag]
+    * enote list [notebook] [tag]
+
+XHTML -> HTML -> TXT
+- https://github.com/CarlLee/ENML_PY (ENML -> TXT)
