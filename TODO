@@ -1,7 +1,6 @@
 TODO:
-- html -> txt
 - Decide name of "executable" and create setup.py
-- create PKGBUILD for arch
+- create PKGBUILD for arch (and depencies)
 
 TODO:
 - argparse for parsing argumetnts - see CLI below
@@ -10,6 +9,7 @@ TODO:
 - only dl listed notebooks / notes
 - only dl since some date
 - command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
+- error handling
 ---
 
 Dependencies:

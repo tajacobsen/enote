@@ -99,7 +99,7 @@ class ENote:
                 self.note_store.getNoteContent(self.auth_token, note.guid)
                 ))
 
-if __name__ == "__main__":
+def main():
     config = ConfigParser.ConfigParser()
     config.read(os.path.expandvars(config_file))
     basedir = os.path.expandvars(config.get("enote", "basedir"))
@@ -109,3 +109,6 @@ if __name__ == "__main__":
     enote.getNotes()
     for note in enote.notes:
         note.pprint(fmt="txt")
+
+if __name__ == "__main__":
+    main()
