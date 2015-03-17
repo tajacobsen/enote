@@ -10,12 +10,15 @@ TODO:
 - command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
 - error handling
 - error handling in executable
----
+- un-bundle ENMLToHTML
+- bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
+--- ---
 
 Dependencies:
 - evernote-sdk-python-git
 - python2-oauth2
 - python2-thrift => Have to use the one provided by evernote!!
+- python2-html2text
 
 CLI
     * enote pull [notebook] [tag]

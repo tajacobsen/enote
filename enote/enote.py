@@ -61,9 +61,9 @@ class Note:
             f.write(u"\n")
 
 class ENote:
-    def __init__(self, auth_token):
+    def __init__(self, auth_token, sandbox = False):
         self.auth_token = auth_token
-        self.client = EvernoteClient(token = auth_token, sandbox = True)
+        self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
         self.note_store = self.client.get_note_store()
 
         self.notebooks = {}
@@ -83,7 +83,8 @@ class ENote:
         note_filter = NoteFilter()
 
         offset = 0
-        max_notes = 10
+        #TODO: read from default set of options
+        max_notes = 1000
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
         result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, max_notes, result_spec)
         for note in result_list.notes:
@@ -104,8 +105,9 @@ def main():
     config.read(os.path.expandvars(config_file))
     basedir = os.path.expandvars(config.get("enote", "basedir"))
     access_token = config.get("enote", "token")
+    sandbox = config.getboolean("enote", "sandbox")
 
-    enote = ENote(access_token)
+    enote = ENote(access_token, sandbox)
     enote.getNotes()
     for note in enote.notes:
         note.pprint(fmt="txt")
