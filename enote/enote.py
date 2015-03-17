@@ -3,7 +3,7 @@
 import os, io, sys
 # Requred as evernote notes are unicode
 reload(sys)
-sys.setdefaultencoding("utf-8")
+sys.setdefaultencoding('utf-8')
 
 import ConfigParser
 from evernote.api.client import EvernoteClient
@@ -12,7 +12,7 @@ from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from enmltohtml import enmltohtml
 from tools import htmltotxt
 
-config_file = "$HOME/.config/enote.cfg"
+import config
 
 class Note:
     def __init__(self, title, guid, notebook_name, tags, content):
@@ -22,7 +22,7 @@ class Note:
         self.tags = tags
         self.content = content
 
-    def write(self, basedir):
+    def write(self, basedir, fmt="txt"):
         if basedir[-1] == "/":
             outdir = basedir + self.notebook_name
         else:
@@ -36,8 +36,8 @@ class Note:
             if not os.path.isdir(subpath):
                 os.mkdir(subpath)
 
-        f = io.open(outdir + "/" + self.title + ".txt", "w")
-        self.pprint(f)
+        f = io.open(outdir + "/" + self.title + "." + fmt, "w")
+        self.pprint(f, fmt)
         f.close()
 
     def pprint(self, f=sys.stdout, fmt="txt"):
@@ -61,7 +61,7 @@ class Note:
             f.write(u"\n")
 
 class ENote:
-    def __init__(self, auth_token, sandbox = False):
+    def __init__(self, auth_token, sandbox = False, max_notes = 1000):
         self.auth_token = auth_token
         self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
         self.note_store = self.client.get_note_store()
@@ -76,17 +76,18 @@ class ENote:
         for tag in self.note_store.listTags():
             self.tags[tag.guid] = tag.name
 
+        self.max_notes = max_notes
+
     def getNotes(self, notebook=None, tag=None):
         #TODO: fix to include notebook
         #notebookGuid = 
         #TODO: fix to include tag(s)
         note_filter = NoteFilter()
+        #TODO: add filter by newest (updated)
 
         offset = 0
-        #TODO: read from default set of options
-        max_notes = 1000
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
-        result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, max_notes, result_spec)
+        result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, self.max_notes, result_spec)
         for note in result_list.notes:
             if note.tagGuids is not None:
                 tags = [self.tags[tag] for tag in note.tagGuids]
@@ -101,16 +102,19 @@ class ENote:
                 ))
 
 def main():
-    config = ConfigParser.ConfigParser()
-    config.read(os.path.expandvars(config_file))
-    basedir = os.path.expandvars(config.get("enote", "basedir"))
-    access_token = config.get("enote", "token")
-    sandbox = config.getboolean("enote", "sandbox")
+    userconfig = ConfigParser.ConfigParser(config.defaults)
+    userconfig.read(os.path.expandvars(config.config_file))
+    basedir = os.path.expandvars(userconfig.get("enote", "basedir"))
+    output_format = userconfig.get("enote", "output_format")
+    access_token = userconfig.get("enote", "token")
+    sandbox = userconfig.getboolean("enote", "sandbox")
+    max_notes = userconfig.getint("enote", "max_notes")
 
-    enote = ENote(access_token, sandbox)
+    enote = ENote(access_token, sandbox, max_notes)
     enote.getNotes()
     for note in enote.notes:
-        note.pprint(fmt="txt")
+        #note.pprint(fmt="txt")
+        note.write(basedir, fmt=output_format)
 
 if __name__ == "__main__":
     main()
