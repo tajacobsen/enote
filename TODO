@@ -1,5 +1,4 @@
 TODO:
-- Decide name of "executable" and create setup.py
 - create PKGBUILD for arch (and depencies)
 
 TODO:
@@ -10,6 +9,7 @@ TODO:
 - only dl since some date
 - command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
 - error handling
+- error handling in executable
 ---
 
 Dependencies:
