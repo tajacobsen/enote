@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 # Copyright (c) 2015 Troels Kofoed Jacobsen
 import os, io, sys
 # Requred as evernote notes are unicode
@@ -8,9 +9,10 @@ sys.setdefaultencoding('utf-8')
 import ConfigParser
 from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
+from evernote.edam.type.ttypes import NoteSortOrder
 
 from enmltohtml import enmltohtml
-from tools import htmltotxt
+from tools import htmltotxt, clean_filename
 
 import config
 
@@ -35,8 +37,10 @@ class Note:
             subpath = "/".join(dirtree[:i])
             if not os.path.isdir(subpath):
                 os.mkdir(subpath)
-
-        f = io.open(outdir + "/" + self.title + "." + fmt, "w")
+        
+        filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
+        print 'Writing \"%s\" to %s'%(self.title, filename)
+        f = io.open(filename, 'w')
         self.pprint(f, fmt)
         f.close()
 
@@ -82,7 +86,7 @@ class ENote:
         #TODO: fix to include notebook
         #notebookGuid = 
         #TODO: fix to include tag(s)
-        note_filter = NoteFilter()
+        note_filter = NoteFilter(order=NoteSortOrder.UPDATED)
         #TODO: add filter by newest (updated)
 
         offset = 0

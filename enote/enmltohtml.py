@@ -1,4 +1,4 @@
-#!/bin/bin/env python2
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # Copyright (c) 2014 CarlLee 
 # Copyright (c) 2015 Troels Kofoed Jacobsen

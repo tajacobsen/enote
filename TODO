@@ -1,6 +1,3 @@
-TODO 0.0.2:
-- what to do about ugly notebook or note names (i.e. not valid on file system)
-
 TODO 0.1.0:
 - argparse for parsing argumetnts - see CLI below
 - possibility to overwrite (some) configuration options
@@ -16,6 +13,7 @@ TODO:
 - error handling in executable
 - bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
 - dependencies to setup.py
+- move "mkdir" functionality to tools
 --- ---
 
 CLI

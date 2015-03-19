@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 # Copyright (c) 2015 Troels Kofoed Jacobsen
 #from distutils.core import setup
 from distutils.core import setup
