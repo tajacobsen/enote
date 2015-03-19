@@ -1,26 +1,24 @@
-TODO:
-- argparse for parsing argumetnts - see CLI below
-- download attachments (folder of same name than note)
+TODO 0.0.2:
 - what to do about ugly notebook or note names (i.e. not valid on file system)
+
+TODO 0.1.0:
+- argparse for parsing argumetnts - see CLI below
+- possibility to overwrite (some) configuration options
 - only dl listed notebooks / notes
 - only dl since some date
 - command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
+
+TODO:
+- unbundle thrift library (or do something else)
+- unbundle ENMLToHTML
+- download attachments (folder of same name than note)
 - error handling
 - error handling in executable
-- un-bundle ENMLToHTML
 - bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
+- dependencies to setup.py
 --- ---
-
-Dependencies:
-- evernote-sdk-python-git
-- python2-oauth2
-- python2-thrift => Have to use the one provided by evernote!!
-- python2-html2text
 
 CLI
     * enote pull [notebook] [tag]
     * enote print [tag]
     * enote list [notebook] [tag]
-
-- https://github.com/CarlLee/ENML_PY (ENML -> html)
-- https://github.com/aaronsw/html2text (html -> txt)
