@@ -68,6 +68,7 @@ class ENote:
     def __init__(self, auth_token, sandbox = False, max_notes = 1000):
         self.auth_token = auth_token
         self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
+        print 'Initializing Note Store'
         self.note_store = self.client.get_note_store()
 
         self.notebooks = {}
@@ -91,19 +92,27 @@ class ENote:
 
         offset = 0
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
+        print 'Downloading Meta Data'
         result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, self.max_notes, result_spec)
         for note in result_list.notes:
             if note.tagGuids is not None:
                 tags = [self.tags[tag] for tag in note.tagGuids]
             else:
                 tags = []
+
+            print 'Downloading Note Content: \"%s\"'%(note.title)
+            note_content = self.note_store.getNoteContent(self.auth_token, note.guid)
             self.notes.append(Note(
                 note.title,
                 note.guid,
                 self.notebooks[note.notebookGuid],
                 tags,
-                self.note_store.getNoteContent(self.auth_token, note.guid)
+                note_content
                 ))
+
+    def writeNotes(self, basedir, fmt="txt"):
+        for note in self.notes:
+            note.write(basedir, fmt=fmt)
 
 def main():
     userconfig = ConfigParser.ConfigParser(config.defaults)
@@ -116,9 +125,7 @@ def main():
 
     enote = ENote(access_token, sandbox, max_notes)
     enote.getNotes()
-    for note in enote.notes:
-        #note.pprint(fmt="txt")
-        note.write(basedir, fmt=output_format)
+    enote.writeNotes(basedir, fmt=output_format)
 
 if __name__ == "__main__":
     main()
