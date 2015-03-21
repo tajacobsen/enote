@@ -39,10 +39,13 @@ class Note:
                 os.mkdir(subpath)
         
         filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
-        print 'Writing \"%s\" to %s'%(self.title, filename)
+        sys.stdout.write('Writing \"%s\" to %s'%(self.title, filename))
+        sys.stdout.flush()
         f = io.open(filename, 'w')
         self.pprint(f, fmt)
         f.close()
+        sys.stdout.write(' - OK\n')
+        sys.stdout.flush()
 
     def pprint(self, f=sys.stdout, fmt="txt"):
         if fmt == "enml":
@@ -68,8 +71,11 @@ class ENote:
     def __init__(self, auth_token, sandbox = False, max_notes = 1000):
         self.auth_token = auth_token
         self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
-        print 'Initializing Note Store'
+        sys.stdout.write('Initializing Note Store')
+        sys.stdout.flush()
         self.note_store = self.client.get_note_store()
+        sys.stdout.write(' - OK\n')
+        sys.stdout.flush()
 
         self.notebooks = {}
         for notebook in self.note_store.listNotebooks():
@@ -92,15 +98,19 @@ class ENote:
 
         offset = 0
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
-        print 'Downloading Meta Data'
+        sys.stdout.write('Downloading Meta Data')
+        sys.stdout.flush()
         result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, self.max_notes, result_spec)
+        sys.stdout.write(' - OK\n')
+        sys.stdout.flush()
         for note in result_list.notes:
             if note.tagGuids is not None:
                 tags = [self.tags[tag] for tag in note.tagGuids]
             else:
                 tags = []
 
-            print 'Downloading Note Content: \"%s\"'%(note.title)
+            sys.stdout.write('Downloading Note Content: \"%s\"'%(note.title))
+            sys.stdout.flush()
             note_content = self.note_store.getNoteContent(self.auth_token, note.guid)
             self.notes.append(Note(
                 note.title,
@@ -109,6 +119,8 @@ class ENote:
                 tags,
                 note_content
                 ))
+            sys.stdout.write(' - OK\n')
+            sys.stdout.flush()
 
     def writeNotes(self, basedir, fmt="txt"):
         for note in self.notes:

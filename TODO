@@ -1,22 +1,29 @@
-TODO 0.1.0:
-- argparse for parsing argumetnts - see CLI below
-- possibility to overwrite (some) configuration options
-- only dl listed notebooks / notes
-- only dl since some date
-- command line switch to print txt or enml or html (TAG:, TITLE: should be native comment to ensure valid html)
+TODO 0.0.3:
+- "- OK" in verbose
+- try / catch for downloading individual notes (set content to None)
 
-TODO:
+TODO 0.1.0:
+- move all option handling to options.py (rename from config.py)
+- argparse for parsing argumetnts - see CLI below
+- option to only download from listed notebook(s)
+- option to only download with specific tag
+- option to enable/disable verbosity
+- option to only pull notes newer than xxx
+- option to select output format
+- option to set basedir
+- option to set max_notes
+- "list" command to list notes
+- "list-notebooks" command to list notebooks
+- "list-tags" command to list tags
+
+
+Wish list:
 - unbundle thrift library (or do something else)
 - unbundle ENMLToHTML
-- download attachments (folder of same name than note)
 - error handling
 - error handling in executable
+- download attachments (folder of same name than note)
 - bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
 - dependencies to setup.py
 - move "mkdir" functionality to tools
---- ---
-
-CLI
-    * enote pull [notebook] [tag]
-    * enote print [tag]
-    * enote list [notebook] [tag]
+- option to only pull differences (requires writing state to target dir)
