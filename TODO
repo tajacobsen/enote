@@ -1,7 +1,3 @@
-TODO 0.0.3:
-- "- OK" in verbose
-- try / catch for downloading individual notes (set content to None)
-
 TODO 0.1.0:
 - move all option handling to options.py (rename from config.py)
 - argparse for parsing argumetnts - see CLI below
@@ -12,6 +8,8 @@ TODO 0.1.0:
 - option to select output format
 - option to set basedir
 - option to set max_notes
+- option to set number of retries (download note content)
+- "profiles" in enote.cfg ([enote] is general options, [profile:xxx] for specific sets of all/most data (at least sandbox, token, basedir))
 - "list" command to list notes
 - "list-notebooks" command to list notebooks
 - "list-tags" command to list tags

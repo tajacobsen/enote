@@ -38,14 +38,18 @@ class Note:
             if not os.path.isdir(subpath):
                 os.mkdir(subpath)
         
-        filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
-        sys.stdout.write('Writing \"%s\" to %s'%(self.title, filename))
-        sys.stdout.flush()
-        f = io.open(filename, 'w')
-        self.pprint(f, fmt)
-        f.close()
-        sys.stdout.write(' - OK\n')
-        sys.stdout.flush()
+        if self.content is not None:
+            filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
+            sys.stdout.write('Writing \"%s\" to %s'%(self.title, filename))
+            sys.stdout.flush()
+            f = io.open(filename, 'w')
+            self.pprint(f, fmt)
+            f.close()
+            sys.stdout.write(' - OK\n')
+            sys.stdout.flush()
+        else:
+            sys.stdout.write('Unable to write \"%s\" (no content)\n'%(self.title, ))
+            sys.stdout.flush()
 
     def pprint(self, f=sys.stdout, fmt="txt"):
         if fmt == "enml":
@@ -111,7 +115,19 @@ class ENote:
 
             sys.stdout.write('Downloading Note Content: \"%s\"'%(note.title))
             sys.stdout.flush()
-            note_content = self.note_store.getNoteContent(self.auth_token, note.guid)
+            note_content = None
+            for i in range(3):
+                if note_content is None:
+                    try:
+                        note_content = self.note_store.getNoteContent(self.auth_token, note.guid)
+                        sys.stdout.write(' - OK\n')
+                    except:
+                        if i < 2:
+                            sys.stdout.write(' - retrying...')
+                        else:
+                            sys.stdout.write(' - FAILED\n')
+                    sys.stdout.flush()
+
             self.notes.append(Note(
                 note.title,
                 note.guid,
@@ -119,12 +135,10 @@ class ENote:
                 tags,
                 note_content
                 ))
-            sys.stdout.write(' - OK\n')
-            sys.stdout.flush()
 
     def writeNotes(self, basedir, fmt="txt"):
         for note in self.notes:
-            note.write(basedir, fmt=fmt)
+                note.write(basedir, fmt=fmt)
 
 def main():
     userconfig = ConfigParser.ConfigParser(config.defaults)
