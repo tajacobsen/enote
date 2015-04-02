@@ -1,15 +1,17 @@
-TODO 0.1.0:
+TODO 0.0.4:
 + move all option handling to options.py (rename from config.py)
-- argparse for parsing argumetnts - see CLI below
++ argparse for parsing argumetnts - see CLI below
++ option to select output format
++ option to set basedir
++ option to set max_notes
++ "profiles" in enote.cfg ([enote] is general options, [profile:xxx] for specific sets of all/most data (at least sandbox, token, basedir))
+
+TODO 0.1.0:
+- option to only pull notes newer than xxx
 - option to only download from listed notebook(s)
 - option to only download with specific tag
 - option to enable/disable verbosity
-- option to only pull notes newer than xxx
-- option to select output format
-- option to set basedir
-- option to set max_notes
 - option to set number of retries (download note content)
-- "profiles" in enote.cfg ([enote] is general options, [profile:xxx] for specific sets of all/most data (at least sandbox, token, basedir))
 - "list" command to list notes
 - "list-notebooks" command to list notebooks
 - "list-tags" command to list tags

@@ -7,30 +7,21 @@ import ConfigParser
 import argparse
 
 config_file = '$HOME/.config/enote.cfg'
-defaults = {
-        'basedir': '$HOME/enote',
-        'output_format': 'txt',
-        'sandbox': 'False',
-        'max_notes': '1000',
-        }
-
-def read_config():
-    userconfig = ConfigParser.ConfigParser(defaults)
-    userconfig.read(os.path.expandvars(config_file))
-
-    config = {}
-    config['basedir'] = os.path.expandvars(userconfig.get("enote", "basedir"))
-    config['output_format'] = userconfig.get("enote", "output_format")
-    config['token'] = userconfig.get("enote", "token")
-    config['sandbox'] = userconfig.getboolean("enote", "sandbox")
-    config['max_notes'] = userconfig.getint("enote", "max_notes")
-
-    return config
+defaults = {'basedir': '$HOME/enote',
+            'output_format': 'txt',
+            'sandbox': 'False',
+            'max_notes': '1000'}
+opts = {'basedir': 'str',
+        'output_format': 'str',
+        'token': 'str',
+        'sandbox': 'bool',
+        'max_notes': 'int'}
 
 def parse_arguments():
     #TODO: move description to __init__.py (so both this file and setup.py can read)
     parser = argparse.ArgumentParser(description='Command line utility to backup Evernote notes and notebooks.')
     #TODO: wirite help lines
+    parser.add_argument('--profile', type=str)
     parser.add_argument('--basedir', type=str)
     parser.add_argument('-fmt', '--output_format', type=str)
     parser.add_argument('--token', type=str)
@@ -39,19 +30,43 @@ def parse_arguments():
     args = parser.parse_args()
     return args
 
+def get(userconfig, section, key, opt_type):
+    if opt_type == 'str':
+        return userconfig.get(section, key)
+    elif opt_type == 'int':
+        return userconfig.getint(section, key)
+    elif opt_type  == 'bool':
+        return userconfig.getboolean(section, key)
+
+def get_option(args, userconfig, profile, key, opt_type='str'):
+    # arg > profile in cfg file > default in cfg file > default
+    if vars(args).has_key(key) and vars(args)[key] is not None:
+        return vars(args)[key]
+    elif userconfig.has_option(profile, key):
+        return get(userconfig, profile, key, opt_type)
+    elif userconfig.has_option('enote', key):
+        return get(userconfig, 'enote', key, opt_type)
+    else:
+        return defaults[key]
 
 def get_config():
-    config = read_config()
     args = parse_arguments()
-    if args.basedir is not None:
-        config['basedir'] = args.basedir
-    if args.output_format is not None:
-        config['output_format'] = args.output_format
-    if args.token is not None:
-        config['token'] = args.token
-    if args.sandbox is not None:
-        config['sandbox'] = args.sandbox
-    if args.basedir is not None:
-        config['max_notes'] = args.max_notes
+    userconfig = ConfigParser.ConfigParser()
+    userconfig.read(os.path.expandvars(config_file))
+
+    if args.profile is not None:
+        profile = args.profile
+    elif userconfig.has_option('enote', 'profile'):
+        profile = userconfig.get('enote', 'profile')
+    else:
+        profile = None
+    
+    config = {}
+    for opt in opts.keys():
+        config[opt] = get_option(args, userconfig, profile, opt, opts[opt])
+ 
+    config['basedir'] = os.path.expandvars(config['basedir'])
 
     return config
+
+
