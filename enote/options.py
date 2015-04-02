@@ -26,6 +26,11 @@ def parse_arguments():
     #TODO: move description to __init__.py (so both this file and setup.py can read)
     parser = argparse.ArgumentParser(description='Command line utility to backup Evernote notes and notebooks.')
     #TODO: wirite help lines
+    
+    ## Commands
+    parser.add_argument('command')
+    
+    ## Options
     parser.add_argument('--profile', type=str)
     parser.add_argument('--basedir', type=str)
     parser.add_argument('-fmt', '--output_format', type=str)
@@ -34,6 +39,11 @@ def parse_arguments():
     parser.add_argument('-N', '--max_notes', type=int)
     parser.add_argument('-v', '--verbose', action='store_true' )
     parser.add_argument('-q', '--quiet', action='store_true' )
+
+    ## Filter options
+    parser.add_argument('-n', '--notebook', type=str, nargs='+')
+    parser.add_argument('-t', '--tags', type=str, nargs='+')
+
     args = parser.parse_args()
     return args
 
@@ -81,4 +91,4 @@ def get_config():
  
     config['basedir'] = os.path.expandvars(config['basedir'])
 
-    return config
+    return config, args.command

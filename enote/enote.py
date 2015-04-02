@@ -89,7 +89,7 @@ class ENote:
 
         self.max_notes = max_notes
 
-    def getNotes(self, notebook=None, tag=None):
+    def getNotesMetaData(self, notebook=None, tag=None):
         #TODO: fix to include notebook
         #notebookGuid = 
         #TODO: fix to include tag(s)
@@ -101,6 +101,11 @@ class ENote:
         self.logger.log('Downloading Meta Data')
         result_list = self.note_store.findNotesMetadata(self.token, note_filter, offset, self.max_notes, result_spec)
         self.logger.log(' - OK\n')
+
+        return result_list
+
+    def getNotes(self, notebook=None, tag=None):
+        result_list = self.getNotesMetaData(notebook, tag)
 
         self.logger.log('Downloading %i Notes\n'%(len(result_list.notes),))
         for note in result_list.notes:
@@ -136,13 +141,44 @@ class ENote:
         for note in self.notes:
             note.write(basedir, fmt=fmt)
 
+    def listNotes(self, notebook=None, tag=None):
+        result_list = self.getNotesMetaData(notebook, tag)
+        notes = []
+
+        for note in result_list.notes:
+            notes.append('%s/%s'%(self.notebooks[note.notebookGuid],note.title))
+
+        notes.sort()
+
+        for note in notes:
+            self.logger.log('%s\n'%(note,))
+
+    def listNotebooks(self):
+        notebooks = self.notebooks.values()
+        notebooks.sort()
+        for notebook in notebooks:
+            self.logger.log('%s\n'%(notebook,))
+
+    def listTags(self):
+        tags = self.tags.values()
+        tags.sort()
+        for tag in tags:
+            self.logger.log('%s\n'%(tag,))
+
 
 def main():
-    config = options.get_config()
+    config, command = options.get_config()
     logger = Logger(config['log_level'])
     enote = ENote(config['token'], config['sandbox'], config['max_notes'], logger=logger)
-    enote.getNotes()
-    enote.writeNotes(config['basedir'], fmt=config['output_format'])
+    if command == 'pull':
+        enote.getNotes()
+        enote.writeNotes(config['basedir'], fmt=config['output_format'])
+    elif command == 'list':
+        enote.listNotes()
+    elif command == 'list-notebooks':
+        enote.listNotebooks()
+    elif command == 'list-tags':
+        enote.listTags()
 
 if __name__ == "__main__":
     main()

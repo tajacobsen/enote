@@ -1,11 +1,11 @@
 TODO 0.1.0:
++ "list" command to list notes
++ "list-notebooks" command to list notebooks
++ "list-tags" command to list tags
 - option to only pull notes newer than xxx
 - option to only download from listed notebook(s)
 - option to only download with specific tag
 - option to set number of retries (download note content)
-- "list" command to list notes
-- "list-notebooks" command to list notebooks
-- "list-tags" command to list tags
 
 
 Wish list:
