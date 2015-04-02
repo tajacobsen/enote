@@ -41,7 +41,7 @@ def parse_arguments():
     parser.add_argument('-q', '--quiet', action='store_true' )
 
     ## Filter options
-    parser.add_argument('-n', '--notebook', type=str, nargs='+')
+    parser.add_argument('-n', '--notebook', type=str)
     parser.add_argument('-t', '--tags', type=str, nargs='+')
 
     args = parser.parse_args()
@@ -91,4 +91,7 @@ def get_config():
  
     config['basedir'] = os.path.expandvars(config['basedir'])
 
-    return config, args.command
+    notebook = args.notebook
+    tags = args.tags
+
+    return config, args.command, notebook, tags

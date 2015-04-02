@@ -89,12 +89,24 @@ class ENote:
 
         self.max_notes = max_notes
 
-    def getNotesMetaData(self, notebook=None, tag=None):
-        #TODO: fix to include notebook
-        #notebookGuid = 
-        #TODO: fix to include tag(s)
-        note_filter = NoteFilter(order=NoteSortOrder.UPDATED)
-        #TODO: add filter by newest (updated)
+    def getNotesMetaData(self, notebook=None, tags=None):
+        #TODO: Error handling
+        notebookGuid = None
+        tagGuids = None
+        if notebook is not None:
+            notebookGuid = [item[0] for item in self.notebooks.items() if item[1] == notebook][0]
+        if tags is not None:
+            tagGuids = [item[0] for item in self.tags.items() if item[1] in tags]
+        
+        #TODO: KWARGS
+        if notebookGuid is not None and tagGuids is not None:
+            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, notebookGuid=notebookGuid, tagGuids=tagGuids)
+        elif notebookGuid is not None:
+            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, notebookGuid=notebookGuid)
+        elif tagGuids is not None:
+            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, tagGuids=tagGuids)
+        else:
+            note_filter = NoteFilter(order=NoteSortOrder.UPDATED)
 
         offset = 0
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
@@ -104,8 +116,8 @@ class ENote:
 
         return result_list
 
-    def getNotes(self, notebook=None, tag=None):
-        result_list = self.getNotesMetaData(notebook, tag)
+    def getNotes(self, notebook=None, tags=None):
+        result_list = self.getNotesMetaData(notebook, tags)
 
         self.logger.log('Downloading %i Notes\n'%(len(result_list.notes),))
         for note in result_list.notes:
@@ -141,8 +153,8 @@ class ENote:
         for note in self.notes:
             note.write(basedir, fmt=fmt)
 
-    def listNotes(self, notebook=None, tag=None):
-        result_list = self.getNotesMetaData(notebook, tag)
+    def listNotes(self, notebook=None, tags=None):
+        result_list = self.getNotesMetaData(notebook, tags)
         notes = []
 
         for note in result_list.notes:
@@ -167,14 +179,14 @@ class ENote:
 
 
 def main():
-    config, command = options.get_config()
+    config, command, notebook, tags = options.get_config()
     logger = Logger(config['log_level'])
     enote = ENote(config['token'], config['sandbox'], config['max_notes'], logger=logger)
     if command == 'pull':
-        enote.getNotes()
+        enote.getNotes(notebook, tags)
         enote.writeNotes(config['basedir'], fmt=config['output_format'])
     elif command == 'list':
-        enote.listNotes()
+        enote.listNotes(notebook, tags)
     elif command == 'list-notebooks':
         enote.listNotebooks()
     elif command == 'list-tags':
