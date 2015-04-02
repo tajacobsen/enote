@@ -140,7 +140,7 @@ class ENote:
                 note.write(basedir, fmt=fmt)
 
 def main():
-    config = options.read_config()
+    config = options.get_config()
     enote = ENote(config['token'], config['sandbox'], config['max_notes'])
     enote.getNotes()
     enote.writeNotes(config['basedir'], fmt=config['output_format'])
