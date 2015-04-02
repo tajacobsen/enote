@@ -1,5 +1,5 @@
 TODO 0.1.0:
-- move all option handling to options.py (rename from config.py)
++ move all option handling to options.py (rename from config.py)
 - argparse for parsing argumetnts - see CLI below
 - option to only download from listed notebook(s)
 - option to only download with specific tag
