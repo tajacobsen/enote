@@ -11,17 +11,18 @@ from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from evernote.edam.type.ttypes import NoteSortOrder
 
 from enmltohtml import enmltohtml
-from tools import htmltotxt, clean_filename, LogLevel
+from tools import htmltotxt, clean_filename, LogLevel, Logger
 
 import options
 
 class Note:
-    def __init__(self, title, guid, notebook_name, tags, content):
+    def __init__(self, title, guid, notebook_name, tags, content, logger=Logger()):
         self.title = title
         self.guid = guid
         self.notebook_name = notebook_name
         self.tags = tags
         self.content = content
+        self.logger = logger
 
     def write(self, basedir, fmt="txt"):
         if basedir[-1] == "/":
@@ -39,16 +40,13 @@ class Note:
         
         if self.content is not None:
             filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
-            sys.stdout.write('Writing \"%s\" to %s'%(self.title, filename))
-            sys.stdout.flush()
+            self.logger.log('Writing \"%s\" to %s'%(self.title, filename), LogLevel.VERBOSE)
             f = io.open(filename, 'w')
             self.pprint(f, fmt)
             f.close()
-            sys.stdout.write(' - OK\n')
-            sys.stdout.flush()
+            self.logger.log(' - OK\n', LogLevel.VERBOSE)
         else:
-            sys.stdout.write('Unable to write \"%s\" (no content)\n'%(self.title, ))
-            sys.stdout.flush()
+            self.logger.log('Unable to write \"%s\" (no content)\n'%(self.title, ))
 
     def pprint(self, f=sys.stdout, fmt="txt"):
         if fmt == "enml":
@@ -71,15 +69,13 @@ class Note:
             f.write(u"\n")
 
 class ENote:
-    def __init__(self, auth_token, sandbox = False, max_notes = 1000, log_level=LogLevel.DEFAULT):
-        self.auth_token = auth_token
-        self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
-        sys.stdout.write('Initializing Note Store')
-        sys.stdout.flush()
+    def __init__(self, token, sandbox = False, max_notes = 1000, logger=Logger()):
+        self.token = token
+        self.logger = logger
+        self.client = EvernoteClient(token=token, sandbox=sandbox)
+        self.logger.log('Initializing Note Store')
         self.note_store = self.client.get_note_store()
-        sys.stdout.write(' - OK\n')
-        sys.stdout.flush()
-        self.log_level=log_level
+        self.logger.log(' - OK\n')
 
         self.notebooks = {}
         for notebook in self.note_store.listNotebooks():
@@ -102,53 +98,49 @@ class ENote:
 
         offset = 0
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
-        sys.stdout.write('Downloading Meta Data')
-        sys.stdout.flush()
-        result_list = self.note_store.findNotesMetadata(self.auth_token, note_filter, offset, self.max_notes, result_spec)
-        sys.stdout.write(' - OK\n')
-        sys.stdout.flush()
+        self.logger.log('Downloading Meta Data')
+        result_list = self.note_store.findNotesMetadata(self.token, note_filter, offset, self.max_notes, result_spec)
+        self.logger.log(' - OK\n')
+
+        self.logger.log('Downloading %i Notes\n'%(len(result_list.notes),))
         for note in result_list.notes:
             if note.tagGuids is not None:
                 tags = [self.tags[tag] for tag in note.tagGuids]
             else:
                 tags = []
 
-            sys.stdout.write('Downloading Note Content: \"%s\"'%(note.title))
-            sys.stdout.flush()
+            self.logger.log('Downloading Note Content: \"%s\"'%(note.title), LogLevel.VERBOSE)
             note_content = None
             for i in range(3):
                 if note_content is None:
                     try:
-                        note_content = self.note_store.getNoteContent(self.auth_token, note.guid)
-                        sys.stdout.write(' - OK\n')
+                        note_content = self.note_store.getNoteContent(self.token, note.guid)
+                        self.logger.log(' - OK\n', LogLevel.VERBOSE)
                     except:
                         if i < 2:
-                            self.log(' - retrying...',)
+                            self.logger.log(' - retrying...', LogLevel.VERBOSE)
                         else:
-                            self.log(' - FAILED\n')
+                            self.logger.log(' - FAILED\n', LogLevel.VERBOSE)
 
             self.notes.append(Note(
                 note.title,
                 note.guid,
                 self.notebooks[note.notebookGuid],
                 tags,
-                note_content
+                note_content,
+                logger=self.logger
                 ))
 
     def writeNotes(self, basedir, fmt="txt"):
+        self.logger.log('Writing %i Notes\n'%(len(self.notes),))
         for note in self.notes:
             note.write(basedir, fmt=fmt)
-
-    def log(self, text, log_level=LogLevel.DEFAULT, f=sys.stdout):
-        if log_level <= self.log_level:
-            f.write(text)
-            f.flush()
-
 
 
 def main():
     config = options.get_config()
-    enote = ENote(config['token'], config['sandbox'], config['max_notes'])
+    logger = Logger(config['log_level'])
+    enote = ENote(config['token'], config['sandbox'], config['max_notes'], logger=logger)
     enote.getNotes()
     enote.writeNotes(config['basedir'], fmt=config['output_format'])
 

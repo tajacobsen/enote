@@ -5,6 +5,7 @@
 import html2text
 import re
 import string
+import sys
 
 def htmltotxt(content):
     text = html2text.html2text(content)
@@ -19,3 +20,12 @@ class LogLevel:
     QUIET = 0
     DEFAULT = 1
     VERBOSE = 2
+
+class Logger:
+    def __init__(self, log_level=LogLevel.DEFAULT):
+        self.log_level = log_level
+
+    def log(self, text, log_level=LogLevel.DEFAULT):
+        if log_level <= self.log_level:
+            sys.stdout.write(text)
+            sys.stdout.flush()

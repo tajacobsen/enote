@@ -5,6 +5,7 @@
 import os
 import ConfigParser
 import argparse
+from tools import LogLevel
 
 config_file = '$HOME/.config/enote.cfg'
 defaults = {
@@ -67,14 +68,17 @@ def get_config():
     else:
         profile = None
 
-    print args.verbose
-
     config = {}
+    if args.quiet:
+        config['log_level'] = LogLevel.QUIET
+    elif args.verbose:
+        config['log_level'] = LogLevel.VERBOSE
+    else:
+        config['log_level'] = LogLevel.DEFAULT
+
     for opt in opts.keys():
         config[opt] = get_option(args, userconfig, profile, opt, opts[opt])
  
     config['basedir'] = os.path.expandvars(config['basedir'])
 
     return config
-
-
