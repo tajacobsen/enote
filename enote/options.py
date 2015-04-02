@@ -7,15 +7,19 @@ import ConfigParser
 import argparse
 
 config_file = '$HOME/.config/enote.cfg'
-defaults = {'basedir': '$HOME/enote',
-            'output_format': 'txt',
-            'sandbox': 'False',
-            'max_notes': '1000'}
-opts = {'basedir': 'str',
-        'output_format': 'str',
-        'token': 'str',
-        'sandbox': 'bool',
-        'max_notes': 'int'}
+defaults = {
+    'basedir': '$HOME/enote',
+    'output_format': 'txt',
+    'sandbox': 'False',
+    'max_notes': '1000',
+    }
+opts = {
+    'basedir': 'str',
+    'output_format': 'str',
+    'token': 'str',
+    'sandbox': 'bool',
+    'max_notes': 'int',
+    }
 
 def parse_arguments():
     #TODO: move description to __init__.py (so both this file and setup.py can read)
@@ -27,6 +31,8 @@ def parse_arguments():
     parser.add_argument('--token', type=str)
     parser.add_argument('--sandbox', type=bool)
     parser.add_argument('-N', '--max_notes', type=int)
+    parser.add_argument('-v', '--verbose', action='store_true' )
+    parser.add_argument('-q', '--quiet', action='store_true' )
     args = parser.parse_args()
     return args
 
@@ -60,7 +66,9 @@ def get_config():
         profile = userconfig.get('enote', 'profile')
     else:
         profile = None
-    
+
+    print args.verbose
+
     config = {}
     for opt in opts.keys():
         config[opt] = get_option(args, userconfig, profile, opt, opts[opt])

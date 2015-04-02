@@ -11,7 +11,7 @@ from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from evernote.edam.type.ttypes import NoteSortOrder
 
 from enmltohtml import enmltohtml
-from tools import htmltotxt, clean_filename
+from tools import htmltotxt, clean_filename, LogLevel
 
 import options
 
@@ -71,7 +71,7 @@ class Note:
             f.write(u"\n")
 
 class ENote:
-    def __init__(self, auth_token, sandbox = False, max_notes = 1000):
+    def __init__(self, auth_token, sandbox = False, max_notes = 1000, log_level=LogLevel.DEFAULT):
         self.auth_token = auth_token
         self.client = EvernoteClient(token = auth_token, sandbox = sandbox)
         sys.stdout.write('Initializing Note Store')
@@ -79,6 +79,7 @@ class ENote:
         self.note_store = self.client.get_note_store()
         sys.stdout.write(' - OK\n')
         sys.stdout.flush()
+        self.log_level=log_level
 
         self.notebooks = {}
         for notebook in self.note_store.listNotebooks():
@@ -122,10 +123,9 @@ class ENote:
                         sys.stdout.write(' - OK\n')
                     except:
                         if i < 2:
-                            sys.stdout.write(' - retrying...')
+                            self.log(' - retrying...',)
                         else:
-                            sys.stdout.write(' - FAILED\n')
-                    sys.stdout.flush()
+                            self.log(' - FAILED\n')
 
             self.notes.append(Note(
                 note.title,
@@ -137,7 +137,14 @@ class ENote:
 
     def writeNotes(self, basedir, fmt="txt"):
         for note in self.notes:
-                note.write(basedir, fmt=fmt)
+            note.write(basedir, fmt=fmt)
+
+    def log(self, text, log_level=LogLevel.DEFAULT, f=sys.stdout):
+        if log_level <= self.log_level:
+            f.write(text)
+            f.flush()
+
+
 
 def main():
     config = options.get_config()
