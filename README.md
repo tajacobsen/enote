@@ -17,3 +17,5 @@ Create a configuration file named $HOME/.config/enote.cfg with the following con
 
     [enote]
     token = XXX
+
+Token is a developer token the user must obtain from https://www.evernote.com/api/DeveloperToken.action
