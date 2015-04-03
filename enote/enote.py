@@ -90,23 +90,19 @@ class ENote:
         self.max_notes = max_notes
 
     def getNotesMetaData(self, notebook=None, tags=None):
-        #TODO: Error handling
-        notebookGuid = None
-        tagGuids = None
+        kwargs = {'order': NoteSortOrder.UPDATED} 
         if notebook is not None:
-            notebookGuid = [item[0] for item in self.notebooks.items() if item[1] == notebook][0]
+            try:
+                notebookGuid = [item[0] for item in self.notebooks.items() if item[1] == notebook][0]
+                kwargs['notebookGuid'] = notebookGuid
+            except:
+                self.logger.log('ERROR: Could not find notebook: %s\n'%(notebook,), LogLevel.QUIET)
+                sys.exit(1)
         if tags is not None:
             tagGuids = [item[0] for item in self.tags.items() if item[1] in tags]
-        
-        #TODO: KWARGS
-        if notebookGuid is not None and tagGuids is not None:
-            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, notebookGuid=notebookGuid, tagGuids=tagGuids)
-        elif notebookGuid is not None:
-            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, notebookGuid=notebookGuid)
-        elif tagGuids is not None:
-            note_filter = NoteFilter(order=NoteSortOrder.UPDATED, tagGuids=tagGuids)
-        else:
-            note_filter = NoteFilter(order=NoteSortOrder.UPDATED)
+            kwargs['tagGuids'] = tagGuids
+
+        note_filter = NoteFilter(**kwargs)
 
         offset = 0
         result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
