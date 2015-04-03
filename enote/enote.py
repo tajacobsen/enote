@@ -10,8 +10,8 @@ from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from evernote.edam.type.ttypes import NoteSortOrder
 
-from enmltohtml import enmltohtml
-from tools import htmltotxt, clean_filename, LogLevel, Logger
+import tools
+from tools import LogLevel, Logger
 
 import options
 
@@ -30,16 +30,10 @@ class Note:
         else:
             outdir = basedir + "/" + self.notebook_name
     
-        # Not possible to mkdir to create all dirs in one go. Therefore need to
-        # iterate through directory tree and create all non-existing dirs
-        dirtree = outdir.split("/")
-        for i in range(2, len(dirtree) + 1):
-            subpath = "/".join(dirtree[:i])
-            if not os.path.isdir(subpath):
-                os.mkdir(subpath)
+        tools.mkdir(outdir)
         
         if self.content is not None:
-            filename = '%s/%s.%s'%(outdir, clean_filename(self.title), fmt)
+            filename = '%s/%s.%s'%(outdir, tools.clean_filename(self.title), fmt)
             self.logger.log('Writing \"%s\" to %s'%(self.title, filename), LogLevel.VERBOSE)
             f = io.open(filename, 'w')
             self.pprint(f, fmt)
@@ -59,13 +53,13 @@ class Note:
             f.write(u"<!--TITLE: %s-->\n" % (self.title,))
             for tag in self.tags:
                 f.write(u"<!--TAG: %s-->\n" % (tag,))
-            f.write(unicode(enmltohtml(self.content)))
+            f.write(unicode(tools.enmltohtml(self.content)))
             f.write(u"\n")
         elif fmt == "txt":
             f.write(u"TITLE: %s\n" % (self.title,))
             for tag in self.tags:
                 f.write(u"TAG: %s\n" % (tag,))
-            f.write(unicode(htmltotxt(enmltohtml(self.content))))
+            f.write(unicode(tools.enmltotxt(self.content)))
             f.write(u"\n")
 
 class ENote:

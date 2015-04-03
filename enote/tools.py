@@ -2,15 +2,19 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2015 Troels Kofoed Jacobsen
 
+import sys, os
 import html2text
 import re
 import string
-import sys
+from enmltohtml import enmltohtml
 
 def htmltotxt(content):
     text = html2text.html2text(content)
     text = text.strip("\n")
     return re.sub(r"\n{2,}","\n", text)
+
+def enmltotxt(content):
+    return htmltotxt(enmltohtml(content))
 
 def clean_filename(text):
     allowed = ' _-.()æøåÆØÅ%s%s'%(string.letters, string.digits)
@@ -29,3 +33,12 @@ class Logger:
         if log_level <= self.log_level:
             sys.stdout.write(text)
             sys.stdout.flush()
+
+def mkdir(directory):
+    # Not possible to mkdir to create all dirs in one go. Therefore need to
+    # iterate through directory tree and create all non-existing dirs
+    dirtree = directory.split("/")
+    for i in range(2, len(dirtree) + 1):
+        subpath = "/".join(dirtree[:i])
+        if not os.path.isdir(subpath):
+            os.mkdir(subpath)
