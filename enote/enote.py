@@ -42,6 +42,7 @@ class Note:
         else:
             self.logger.log('Unable to write \"%s\" (no content)\n'%(self.title, ))
 
+
     def pprint(self, f=sys.stdout, fmt="txt"):
         if fmt == "enml":
             f.write(u"<!--TITLE: %s-->\n" % (self.title,))
@@ -63,8 +64,9 @@ class Note:
             f.write(u"\n")
 
 class ENote:
-    def __init__(self, token, sandbox = False, max_notes = 1000, logger=Logger()):
+    def __init__(self, token, basedir, sandbox=False, max_notes=1000, logger=Logger()):
         self.token = token
+        self.basedir = basedir
         self.logger = logger
         self.client = EvernoteClient(token=token, sandbox=sandbox)
         self.logger.log('Initializing Note Store')
@@ -84,7 +86,7 @@ class ENote:
 
         self.max_notes = max_notes
 
-    def getNotesMetaData(self, notebook=None, tags=None, days=None):
+    def getNotesMetaData(self, notebook=None, tags=None, days=None, diff=False):
         kwargs = {'order': NoteSortOrder.UPDATED} 
         if notebook is not None:
             try:
@@ -110,13 +112,16 @@ class ENote:
         result_list = self.note_store.findNotesMetadata(self.token, note_filter, offset, self.max_notes, result_spec)
         self.logger.log(' - OK\n')
 
-        if days is None:
-            return result_list.notes
-        else:   
+        if diff:
+            lastrun = tools.read_lastrun(self.basedir)
+            return [note for note in result_list.notes if (note.updated/1000L) >= long(lastrun)]
+        elif days is not None:
             return [note for note in result_list.notes if (note.updated/1000L) >= (long(self.curtime) - (60*60*24*days))]
+        else:
+            return result_list.notes
 
-    def getNotes(self, notebook=None, tags=None, days=None):
-        result_list = self.getNotesMetaData(notebook, tags, days)
+    def getNotes(self, notebook=None, tags=None, days=None, diff=False):
+        result_list = self.getNotesMetaData(notebook, tags, days, diff)
 
         self.logger.log('Downloading %i Notes\n'%(len(result_list),))
         for note in result_list:
@@ -147,13 +152,15 @@ class ENote:
                 logger=self.logger
                 ))
 
-    def writeNotes(self, basedir, fmt="txt"):
+    def writeNotes(self, fmt="txt"):
         self.logger.log('Writing %i Notes\n'%(len(self.notes),))
         for note in self.notes:
-            note.write(basedir, fmt=fmt)
+            note.write(self.basedir, fmt=fmt)
 
-    def listNotes(self, notebook=None, tags=None, days=None):
-        result_list = self.getNotesMetaData(notebook, tags, days)
+        tools.write_lastrun(self.basedir, self.curtime)
+
+    def listNotes(self, notebook=None, tags=None, days=None, diff=False):
+        result_list = self.getNotesMetaData(notebook, tags, days, diff)
         notes = []
 
         for note in result_list:
@@ -179,12 +186,18 @@ class ENote:
 def main():
     config, command, notebook, tags = options.get_config()
     logger = Logger(config['log_level'])
-    enote = ENote(config['token'], config['sandbox'], config['max_notes'], logger=logger)
+    enote = ENote(
+        config['token'], 
+        config['basedir'],
+        config['sandbox'],
+        config['max_notes'],
+        logger=logger
+        )
     if command == 'pull':
-        enote.getNotes(notebook, tags, config['days'])
-        enote.writeNotes(config['basedir'], fmt=config['output_format'])
+        enote.getNotes(notebook, tags, config['days'], config['diff'])
+        enote.writeNotes(fmt=config['output_format'])
     elif command == 'list':
-        enote.listNotes(notebook, tags, config['days'])
+        enote.listNotes(notebook, tags, config['days'], config['diff'])
     elif command == 'list-notebooks':
         enote.listNotebooks()
     elif command == 'list-tags':

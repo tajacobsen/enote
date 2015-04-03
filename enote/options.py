@@ -15,6 +15,7 @@ defaults = {
     'sandbox': False,
     'max_notes': 1000,
     'days': None,
+    'diff': False,
     }
 opts = {
     'basedir': 'str',
@@ -23,6 +24,7 @@ opts = {
     'sandbox': 'bool',
     'max_notes': 'int',
     'days': 'long',
+    'diff': 'bool',
     }
 
 def parse_arguments():
@@ -41,6 +43,7 @@ def parse_arguments():
     parser.add_argument('-v', '--verbose', action='store_true' , help='Enable verbosity')
     parser.add_argument('-q', '--quiet', action='store_true', help='Shut up' )
     parser.add_argument('-d', '--days', type=long, help='Download only notes updated within DAYS days')
+    parser.add_argument('--diff', action='store_true', help='Download only notes updated since last run')
 
     ## Filter options
     parser.add_argument('-n', '--notebook', type=str, help='Download only notes in NOTEBOOK')

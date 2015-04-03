@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2015 Troels Kofoed Jacobsen
 
-import sys, os
+import sys, os, pickle, io
 import html2text
 import re
 import string
@@ -42,3 +42,14 @@ def mkdir(directory):
         subpath = "/".join(dirtree[:i])
         if not os.path.isdir(subpath):
             os.mkdir(subpath)
+
+def write_lastrun(basedir, curtime):
+    f = io.open('%s/.enote.log'%(basedir,), 'wb')
+    pickle.dump(curtime, f)
+    f.close()
+
+def read_lastrun(basedir):
+    f = io.open('%s/.enote.log'%(basedir,), 'rb')
+    lastrun = pickle.load(f)
+    f.close()
+    return lastrun

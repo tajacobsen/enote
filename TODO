@@ -1,4 +1,5 @@
 TODO 0.1.1:
++ option to only pull differences (requires writing state to target dir)
 
 Wish list:
 - unbundle thrift library (or do something else)
@@ -8,5 +9,3 @@ Wish list:
 - download attachments (folder of same name than note)
 - bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
 - dependencies to setup.py
-- option to only pull differences (requires writing state to target dir)
-- cleanup TODOs
