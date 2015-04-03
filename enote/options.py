@@ -6,6 +6,7 @@ import os
 import ConfigParser
 import argparse
 from tools import LogLevel
+from __init__ import __description__
 
 config_file = '$HOME/.config/enote.cfg'
 defaults = {
@@ -25,8 +26,7 @@ opts = {
     }
 
 def parse_arguments():
-    #TODO: move description to __init__.py (so both this file and setup.py can read)
-    parser = argparse.ArgumentParser(description='Command line utility to backup Evernote notes and notebooks.')
+    parser = argparse.ArgumentParser(description=__description__)
     #TODO: wirite help lines
     
     ## Commands

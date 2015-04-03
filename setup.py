@@ -4,13 +4,13 @@
 #from distutils.core import setup
 from distutils.core import setup
 
-from enote import __version__
+from enote import __version__, __description__
 
 setup(
     name='enote',
     version=__version__,
     license='MIT',
-    description='Command line utility to backup Evernote notes and notebooks',
+    description=__description__,
     author='Troels Jacobsen',
     author_email='tkjacobsen@gmail.com',
     url='https://github.com/tkjacobsen/enote',
