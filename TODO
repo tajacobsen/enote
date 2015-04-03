@@ -4,7 +4,7 @@ TODO 0.1.0:
 + "list-tags" command to list tags
 + option to only download from listed notebook(s)
 + option to only download with specific tag
-- option to only pull notes newer than xxx
++ option to only pull notes newer than xxx
 
 
 Wish list:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # Copyright (c) 2015 Troels Kofoed Jacobsen
-import os, io, sys
+import os, io, sys, time
 # Requred as evernote notes are unicode
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -76,6 +76,7 @@ class ENote:
         self.logger.log('Initializing Note Store')
         self.note_store = self.client.get_note_store()
         self.logger.log(' - OK\n')
+        self.curtime = time.time()
 
         self.notebooks = {}
         for notebook in self.note_store.listNotebooks():
@@ -89,7 +90,7 @@ class ENote:
 
         self.max_notes = max_notes
 
-    def getNotesMetaData(self, notebook=None, tags=None):
+    def getNotesMetaData(self, notebook=None, tags=None, days=None):
         kwargs = {'order': NoteSortOrder.UPDATED} 
         if notebook is not None:
             try:
@@ -105,18 +106,26 @@ class ENote:
         note_filter = NoteFilter(**kwargs)
 
         offset = 0
-        result_spec = NotesMetadataResultSpec(includeTitle=True, includeNotebookGuid=True, includeTagGuids=True)
+        result_spec = NotesMetadataResultSpec(
+            includeTitle=True,
+            includeNotebookGuid=True,
+            includeTagGuids=True,
+            includeUpdated=True
+            )
         self.logger.log('Downloading Meta Data')
         result_list = self.note_store.findNotesMetadata(self.token, note_filter, offset, self.max_notes, result_spec)
         self.logger.log(' - OK\n')
 
-        return result_list
+        if days is None:
+            return result_list.notes
+        else:   
+            return [note for note in result_list.notes if (note.updated/1000L) >= (long(self.curtime) - (60*60*24*days))]
 
-    def getNotes(self, notebook=None, tags=None):
-        result_list = self.getNotesMetaData(notebook, tags)
+    def getNotes(self, notebook=None, tags=None, days=None):
+        result_list = self.getNotesMetaData(notebook, tags, days)
 
-        self.logger.log('Downloading %i Notes\n'%(len(result_list.notes),))
-        for note in result_list.notes:
+        self.logger.log('Downloading %i Notes\n'%(len(result_list),))
+        for note in result_list:
             if note.tagGuids is not None:
                 tags = [self.tags[tag] for tag in note.tagGuids]
             else:
@@ -149,11 +158,11 @@ class ENote:
         for note in self.notes:
             note.write(basedir, fmt=fmt)
 
-    def listNotes(self, notebook=None, tags=None):
-        result_list = self.getNotesMetaData(notebook, tags)
+    def listNotes(self, notebook=None, tags=None, days=None):
+        result_list = self.getNotesMetaData(notebook, tags, days)
         notes = []
 
-        for note in result_list.notes:
+        for note in result_list:
             notes.append('%s/%s'%(self.notebooks[note.notebookGuid],note.title))
 
         notes.sort()
@@ -173,16 +182,15 @@ class ENote:
         for tag in tags:
             self.logger.log('%s\n'%(tag,))
 
-
 def main():
     config, command, notebook, tags = options.get_config()
     logger = Logger(config['log_level'])
     enote = ENote(config['token'], config['sandbox'], config['max_notes'], logger=logger)
     if command == 'pull':
-        enote.getNotes(notebook, tags)
+        enote.getNotes(notebook, tags, config['days'])
         enote.writeNotes(config['basedir'], fmt=config['output_format'])
     elif command == 'list':
-        enote.listNotes(notebook, tags)
+        enote.listNotes(notebook, tags, config['days'])
     elif command == 'list-notebooks':
         enote.listNotebooks()
     elif command == 'list-tags':

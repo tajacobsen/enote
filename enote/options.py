@@ -11,8 +11,9 @@ config_file = '$HOME/.config/enote.cfg'
 defaults = {
     'basedir': '$HOME/enote',
     'output_format': 'txt',
-    'sandbox': 'False',
-    'max_notes': '1000',
+    'sandbox': False,
+    'max_notes': 1000,
+    'days': None,
     }
 opts = {
     'basedir': 'str',
@@ -20,6 +21,7 @@ opts = {
     'token': 'str',
     'sandbox': 'bool',
     'max_notes': 'int',
+    'days': 'long',
     }
 
 def parse_arguments():
@@ -39,6 +41,7 @@ def parse_arguments():
     parser.add_argument('-N', '--max_notes', type=int)
     parser.add_argument('-v', '--verbose', action='store_true' )
     parser.add_argument('-q', '--quiet', action='store_true' )
+    parser.add_argument('-d', '--days', type=long)
 
     ## Filter options
     parser.add_argument('-n', '--notebook', type=str)
