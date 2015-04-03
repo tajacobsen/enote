@@ -27,25 +27,24 @@ opts = {
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description=__description__)
-    #TODO: wirite help lines
     
     ## Commands
-    parser.add_argument('command')
+    parser.add_argument('command', help='One of: pull (download notes), list (list notes), list-notebooks, list-tags')
     
     ## Options
-    parser.add_argument('--profile', type=str)
-    parser.add_argument('--basedir', type=str)
-    parser.add_argument('-fmt', '--output_format', type=str)
-    parser.add_argument('--token', type=str)
-    parser.add_argument('--sandbox', type=bool)
-    parser.add_argument('-N', '--max_notes', type=int)
-    parser.add_argument('-v', '--verbose', action='store_true' )
-    parser.add_argument('-q', '--quiet', action='store_true' )
-    parser.add_argument('-d', '--days', type=long)
+    parser.add_argument('--profile', type=str, help='Profile to load from enote.cfg')
+    parser.add_argument('--basedir', type=str, help='Directory where notes are written')
+    parser.add_argument('-fmt', '--output_format', type=str, help='Output format (enml|html|txt)')
+    parser.add_argument('--token', type=str, help='Developer token (preferred to set in enote.cfg)')
+    parser.add_argument('--sandbox', action='store_true', help='Point to sandbox.evernote.com')
+    parser.add_argument('-N', '--max_notes', type=int, help='Max number of notes to fetch')
+    parser.add_argument('-v', '--verbose', action='store_true' , help='Enable verbosity')
+    parser.add_argument('-q', '--quiet', action='store_true', help='Shut up' )
+    parser.add_argument('-d', '--days', type=long, help='Download only notes updated within DAYS days')
 
     ## Filter options
-    parser.add_argument('-n', '--notebook', type=str)
-    parser.add_argument('-t', '--tags', type=str, nargs='+')
+    parser.add_argument('-n', '--notebook', type=str, help='Download only notes in NOTEBOOK')
+    parser.add_argument('-t', '--tags', type=str, nargs='+', help='Download only notes with TAGS')
 
     args = parser.parse_args()
     return args
