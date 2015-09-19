@@ -1,6 +1,6 @@
 # Maintainer: Troels Jacobsen <tkjacobsen@gmail.com>
 pkgname=enote
-pkgver=0.1.1
+pkgver=0.1.2
 pkgrel=3
 pkgdesc='Command line utility to backup Evernote notes and notebooks'
 arch=(any)
