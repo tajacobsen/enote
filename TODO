@@ -1,11 +1,22 @@
-TODO 0.1.1:
-+ option to only pull differences (requires writing state to target dir)
+TODO 0.2.0:
+- write a proper argument parser
+- make oauth work properly
+- get rid of config file
+- turn checkboxes into [x] or [ ]
+- get rid of enmltohtml (write my own)
+- get rid of options
+- get rid of tools?
 
-Wish list:
-- unbundle thrift library (or do something else)
-- unbundle ENMLToHTML
-- error handling
-- error handling in executable
-- download attachments (folder of same name than note)
-- bundle enote.cft -> copy on firsts run and instruct user to create it (including instructions for how to get token)
-- dependencies to setup.py
+Spec:
+
+enote init 
+enote list-notebooks
+enote list-tags
+enote list-notes
+    --notebook
+    --tag XX
+enote download
+    --notebook XX
+    --tag XX
+    --delete
+    --incremental
