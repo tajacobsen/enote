@@ -112,7 +112,7 @@ class ENote():
         for note in self.listNotes(notebook, tags):
             print note
 
-    def writeNotes(self, notebook=None, tags=None):
+    def writeNotes(self, notebook=None, tags=None, delete=False, incremental=False):
         self.pullNotes(notebook, tags)
         for note in self.notes:
             notebook = self.notebooks[note.notebookGuid]
@@ -121,15 +121,28 @@ class ENote():
             if not os.path.isdir(notebook_dir):
                 os.mkdir(notebook_dir)
 
-            content = self.note_store.getNoteContent(self.token, note.guid)
-            content = enmltotxt(content)
+            note_path = os.path.join(notebook_dir, note.title + '.txt')
+            do_download = True
+            if incremental:
+                #To be on the safe side we always download notes when mtime does not match exactly
+                if long(os.path.getmtime(note_path)) == note.updated/1000L:
+                    do_download = False
 
-            #TODO: convert to html, txt
-            f = io.open(os.path.join(notebook_dir, note.title + '.txt'), 'w')
-            #FIXME: Next line can give an error in some cases
-            f.write(unicode(content))
-            f.write(u'\n')
-            f.close()
+            if do_download:
+                content = self.note_store.getNoteContent(self.token, note.guid)
+                content = enmltotxt(content)
+
+                f = io.open(note_path, 'w')
+                #FIXME: Next line can give an error in some cases
+                f.write(unicode(content))
+                f.write(u'\n')
+                f.close()
+
+                os.utime(note_path, (-1, note.updated/1000L))
+
+        #TODO: implement --delete
+        if delete:
+            pass
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
@@ -199,15 +212,13 @@ def main():
     if command == 'download':
         if args.delete:
             raise NotImplementedError('--delete not implemented')
-        if args.incremental:
-            raise NotImplementedError('--incremental not implemented')
 
         if args.tags is not None:
             tags = args.tags.split(',')
         else:
             tags = None
 
-        enote.writeNotes(args.notebook, tags)
+        enote.writeNotes(args.notebook, tags, args.delete, args.incremental)
 
 if __name__ == "__main__":
     main()
