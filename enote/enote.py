@@ -11,6 +11,8 @@ import pickle
 import argparse
 
 from evernote.api.client import EvernoteClient
+from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
+from evernote.edam.type.ttypes import NoteSortOrder
 
 from __init__ import __description__
 from auth import ENoteAuth
@@ -24,6 +26,8 @@ class ENote():
         self.notebooks = None
         self.tags = None
 
+        self.notes = []
+
     def pullNotebooks(self):
         if self.notebooks is None:
             self.notebooks = {}
@@ -34,7 +38,10 @@ class ENote():
         self.pullNotebooks()
         notebooks = self.notebooks.values()
         notebooks.sort()
-        for notebook in notebooks:
+        return notebooks
+
+    def printNotebooks(self):
+        for notebook in self.listNotebooks():
             print notebook
 
     def pullTags(self):
@@ -47,8 +54,61 @@ class ENote():
         self.pullTags()
         tags = self.tags.values()
         tags.sort()
-        for tag in tags:
+        return tags
+
+    def printTags(self):
+        for tag in self.listTags():
             print tag
+
+    def pullNotesGuid(self, notebookGuid, tagGuids=None):
+        kwargs = {'order': NoteSortOrder.UPDATED} 
+        kwargs['notebookGuid'] = notebookGuid
+        kwargs['tagGuids'] = tagGuids
+        note_filter = NoteFilter(**kwargs)
+        
+        #TODO: Figure out a way to know if more than 250 notes exist in notebook and handle accordingly
+        offset = 0
+        max_notes = 250
+
+        result_spec = NotesMetadataResultSpec(
+            includeTitle=True,
+            includeNotebookGuid=True,
+            includeTagGuids=True,
+            includeUpdated=True
+            )
+
+        result_list = self.note_store.findNotesMetadata(self.token, note_filter, offset, max_notes, result_spec)
+        self.notes += result_list.notes
+
+    def pullNotes(self, notebook=None, tags=None):
+        self.pullNotebooks()
+        self.pullTags()
+
+        if tags is not None:
+            tagGuids = [item[0] for item in self.tags.items() if item[1] in tags]
+        else:
+            tagGuids = None
+        
+        if notebook is None:
+            for notebookGuid in self.notebooks.keys():
+                self.pullNotesGuid(notebookGuid, tagGuids)
+        else:
+            notebookGuid = [item[0] for item in self.notebooks.items() if item[1] == notebook][0]
+            self.pullNotesGuid(notebookGuid, tagGuids)
+
+    def listNotes(self, notebook=None, tags=None):
+        self.pullNotes(notebook, tags)
+
+        notes = []
+        for note in self.notes:
+            notes.append('%s/%s'%(self.notebooks[note.notebookGuid], note.title))
+
+        notes.sort()
+        return notes  
+
+    def printNotes(self, notebook=None, tags=None):
+        for note in self.listNotes(notebook, tags):
+            print note
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
@@ -66,12 +126,12 @@ def main():
     # list-notes command
     parser_list_notes = subparser.add_parser('list-notes', help='List notes')
     parser_list_notes.add_argument('--notebook', type=str, help='Limit search to specified notebook')
-    parser_list_notes.add_argument('--tag', type=str, help='Limit search to specified tag')
+    parser_list_notes.add_argument('--tags', type=str, help='Limit search to specified tags (comma separated list)')
 
     # download command
     parser_download = subparser.add_parser('download', help='Download notes')
     parser_download.add_argument('--notebook', type=str, help='Limit search to specified notebook')
-    parser_download.add_argument('--tag', type=str, help='Limit search to specified tag')
+    parser_download.add_argument('--tags', type=str, help='Limit search to specified tags (comma separated list)')
     parser_download.add_argument('--delete', action='store_true', help='Delete extraneous files')
     parser_download.add_argument('--incremental', action='store_true', help='Only download new notes')
 
@@ -102,13 +162,18 @@ def main():
     enote = ENote(token)
 
     if command == 'list-notebooks':
-        enote.listNotebooks()
+        enote.printNotebooks()
 
     if command == 'list-tags':
-        enote.listTags()
+        enote.printTags()
 
     if command == 'list-notes':
-        raise NotImplementedError('list-notes command not implemented')
+        if args.tags is not None:
+            tags = args.tags.split(',')
+        else:
+            tags = None
+
+        enote.printNotes(args.notebook, tags)
 
     if command == 'download':
         raise NotImplementedError('download command not implemented')
