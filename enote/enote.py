@@ -2,8 +2,21 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Troels Agergaard Jacobsen
 
+SANDBOX = True
+
+import sys
+import os
+import io
+import pickle
 import argparse
+
 from __init__ import __description__
+from auth import ENoteAuth
+
+class ENote():
+    def __init__(self, token):
+        self.token = token
+        self.client = EvernoteClient(token=token, sandbox=True)
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
@@ -33,8 +46,26 @@ def main():
     args = parser.parse_args()
     command = args.command
 
+    path = os.getcwd()
+    config_file = os.path.join(path, '.enote')
+
     if command == 'init':
-        raise NotImplementedError('init command not implemented')
+        enauth = ENoteAuth() 
+        token = enauth.get_token()
+        #TODO: This will wipe the file. If we store other variables in the future, need to find different way
+        f = io.open(config_file, 'wb')
+        pickle.dump(token, f)
+        f.close()
+        sys.exit(0)
+
+    if not os.path.isfile(os.path.join(path, '.enote')):
+        #TODO: write to stderr
+        print 'Directory not initialized'
+        sys.exit(1)
+
+    f = io.open(config_file, 'rb')
+    token = pickle.load(f)
+    f.close()
 
     if command == 'list-notebooks':
         raise NotImplementedError('list-notebooks command not implemented')
