@@ -6,5 +6,7 @@ The program is licensed under the MIT license.
 
 Installation
 ============
-## Dependencies:
-* evernote-sdk-python
+## Dependencies (FreeBSD pkg names):
+* py27-evernote
+* py27-html2text
+

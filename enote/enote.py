@@ -16,6 +16,7 @@ from evernote.edam.type.ttypes import NoteSortOrder
 
 from __init__ import __description__
 from auth import ENoteAuth
+from tools import enmltotxt
 
 class ENote():
     def __init__(self, token, path):
@@ -121,11 +122,13 @@ class ENote():
                 os.mkdir(notebook_dir)
 
             content = self.note_store.getNoteContent(self.token, note.guid)
+            content = enmltotxt(content)
 
             #TODO: convert to html, txt
-            f = io.open(os.path.join(notebook_dir, note.title + '.enml'), 'w')
+            f = io.open(os.path.join(notebook_dir, note.title + '.txt'), 'w')
             #FIXME: Next line can give an error in some cases
             f.write(unicode(content))
+            f.write(u'\n')
             f.close()
 
 def main():
