@@ -10,6 +10,8 @@ import io
 import pickle
 import argparse
 
+from evernote.api.client import EvernoteClient
+
 from __init__ import __description__
 from auth import ENoteAuth
 
@@ -17,6 +19,36 @@ class ENote():
     def __init__(self, token):
         self.token = token
         self.client = EvernoteClient(token=token, sandbox=True)
+        self.note_store = self.client.get_note_store()
+
+        self.notebooks = None
+        self.tags = None
+
+    def pullNotebooks(self):
+        if self.notebooks is None:
+            self.notebooks = {}
+            for notebook in self.note_store.listNotebooks():
+                self.notebooks[notebook.guid] = notebook.name
+
+    def listNotebooks(self):
+        self.pullNotebooks()
+        notebooks = self.notebooks.values()
+        notebooks.sort()
+        for notebook in notebooks:
+            print notebook
+
+    def pullTags(self):
+        if self.tags is None:
+            self.tags = {}
+            for tag in self.note_store.listTags():
+                self.tags[tag.guid] = tag.name
+
+    def listTags(self):
+        self.pullTags()
+        tags = self.tags.values()
+        tags.sort()
+        for tag in tags:
+            print tag
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
@@ -67,11 +99,13 @@ def main():
     token = pickle.load(f)
     f.close()
 
+    enote = ENote(token)
+
     if command == 'list-notebooks':
-        raise NotImplementedError('list-notebooks command not implemented')
+        enote.listNotebooks()
 
     if command == 'list-tags':
-        raise NotImplementedError('list-tags command not implemented')
+        enote.listTags()
 
     if command == 'list-notes':
         raise NotImplementedError('list-notes command not implemented')
