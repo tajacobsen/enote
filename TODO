@@ -1,22 +1,5 @@
-TODO 0.2.0:
-- write a proper argument parser
+TODO:
+- get rid of "print"
+- error handling
 - make oauth work properly
-- get rid of config file
 - turn checkboxes into [x] or [ ]
-- get rid of enmltohtml (write my own)
-- get rid of options
-- get rid of tools?
-
-Spec:
-
-enote init 
-enote list-notebooks
-enote list-tags
-enote list-notes
-    --notebook
-    --tag XX
-enote download
-    --notebook XX
-    --tag XX
-    --delete
-    --incremental

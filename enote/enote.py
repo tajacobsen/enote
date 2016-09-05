@@ -18,8 +18,9 @@ from __init__ import __description__
 from auth import ENoteAuth
 
 class ENote():
-    def __init__(self, token):
+    def __init__(self, token, path):
         self.token = token
+        self.path = path
         self.client = EvernoteClient(token=token, sandbox=True)
         self.note_store = self.client.get_note_store()
 
@@ -110,6 +111,23 @@ class ENote():
         for note in self.listNotes(notebook, tags):
             print note
 
+    def writeNotes(self, notebook=None, tags=None):
+        self.pullNotes(notebook, tags)
+        for note in self.notes:
+            notebook = self.notebooks[note.notebookGuid]
+            #TODO: Strip special characters
+            notebook_dir = os.path.join(self.path, notebook)
+            if not os.path.isdir(notebook_dir):
+                os.mkdir(notebook_dir)
+
+            content = self.note_store.getNoteContent(self.token, note.guid)
+
+            #TODO: convert to html, txt
+            f = io.open(os.path.join(notebook_dir, note.title + '.enml'), 'w')
+            #FIXME: Next line can give an error in some cases
+            f.write(unicode(content))
+            f.close()
+
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
     subparser = parser.add_subparsers(dest='command')
@@ -159,7 +177,7 @@ def main():
     token = pickle.load(f)
     f.close()
 
-    enote = ENote(token)
+    enote = ENote(token, path)
 
     if command == 'list-notebooks':
         enote.printNotebooks()
@@ -176,7 +194,17 @@ def main():
         enote.printNotes(args.notebook, tags)
 
     if command == 'download':
-        raise NotImplementedError('download command not implemented')
+        if args.delete:
+            raise NotImplementedError('--delete not implemented')
+        if args.incremental:
+            raise NotImplementedError('--incremental not implemented')
+
+        if args.tags is not None:
+            tags = args.tags.split(',')
+        else:
+            tags = None
+
+        enote.writeNotes(args.notebook, tags)
 
 if __name__ == "__main__":
     main()
