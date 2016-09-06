@@ -44,7 +44,7 @@ class ENote():
 
     def printNotebooks(self):
         for notebook in self.listNotebooks():
-            print notebook
+            sys.stdout.write(notebook)
 
     def pullTags(self):
         if self.tags is None:
@@ -60,7 +60,7 @@ class ENote():
 
     def printTags(self):
         for tag in self.listTags():
-            print tag
+            sys.stdout.write(tag)
 
     def pullNotesGuid(self, notebookGuid, tagGuids=None):
         kwargs = {'order': NoteSortOrder.UPDATED} 
@@ -110,7 +110,7 @@ class ENote():
 
     def printNotes(self, notebook=None, tags=None):
         for note in self.listNotes(notebook, tags):
-            print note
+            sys.stdout.write(note)
 
     def writeNotes(self, notebook=None, tags=None, delete=False, incremental=False):
         self.pullNotes(notebook, tags)
@@ -186,7 +186,7 @@ def main():
 
     if not os.path.isfile(os.path.join(path, '.enote')):
         #TODO: write to stderr
-        print 'Directory not initialized'
+        sys.stderr.write('Error: Directory not initialized')
         sys.exit(1)
 
     f = io.open(config_file, 'rb')
