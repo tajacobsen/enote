@@ -4,6 +4,8 @@
 
 import html2text
 import re
+import string
+
 from enmltohtml import enmltohtml
 
 def htmltotxt(content):
