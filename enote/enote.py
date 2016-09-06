@@ -45,6 +45,7 @@ class ENote():
     def printNotebooks(self):
         for notebook in self.listNotebooks():
             sys.stdout.write(notebook)
+            sys.stdout.write('\n')
 
     def pullTags(self):
         if self.tags is None:
@@ -61,6 +62,7 @@ class ENote():
     def printTags(self):
         for tag in self.listTags():
             sys.stdout.write(tag)
+            sys.stdout.write('\n')
 
     def pullNotesGuid(self, notebookGuid, tagGuids=None):
         kwargs = {'order': NoteSortOrder.UPDATED} 
@@ -111,6 +113,7 @@ class ENote():
     def printNotes(self, notebook=None, tags=None):
         for note in self.listNotes(notebook, tags):
             sys.stdout.write(note)
+            sys.stdout.write('\n')
 
     def writeNotes(self, notebook=None, tags=None, delete=False, incremental=False):
         self.pullNotes(notebook, tags)
@@ -130,7 +133,8 @@ class ENote():
                     do_download = False
 
             if note_path in files.keys():
-                sys.stderr.write('Warning: % already written, skipping.')
+                sys.stderr.write('Warning: \"%s\" already written, skipping.'%(note_path,))
+                sys.stderr.write('\n')
                 do_download = False
 
             # Keep track of which files we download 
@@ -195,6 +199,7 @@ def main():
     if not os.path.isfile(os.path.join(path, '.enote')):
         #TODO: write to stderr
         sys.stderr.write('Error: Directory not initialized')
+        sys.stderr.write('\n')
         sys.exit(1)
 
     f = io.open(config_file, 'rb')
