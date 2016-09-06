@@ -55,3 +55,8 @@ optional arguments:
 Contributing
 ============
 Pull requests and issues are welcome. I would specifically like support on implementing a proper OAuth flow. 
+
+Know limitations
+================
+* A maximum of 250 notes per notebook is currently supported
+
