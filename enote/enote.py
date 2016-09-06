@@ -1,10 +1,13 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 # Copyright (c) 2016 Troels Agergaard Jacobsen
-
-SANDBOX = True
-
+# Requred as evernote notes are unicode
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+SANDBOX = False
+
 import os
 import io
 import pickle
@@ -22,7 +25,7 @@ class ENote():
     def __init__(self, token, path):
         self.token = token
         self.path = path
-        self.client = EvernoteClient(token=token, sandbox=True)
+        self.client = EvernoteClient(token=token, sandbox=SANDBOX)
         self.note_store = self.client.get_note_store()
 
         self.notebooks = None
