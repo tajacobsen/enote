@@ -114,6 +114,7 @@ class ENote():
 
     def writeNotes(self, notebook=None, tags=None, delete=False, incremental=False):
         self.pullNotes(notebook, tags)
+        files = {}
         for note in self.notes:
             notebook = self.notebooks[note.notebookGuid]
             #TODO: Strip special characters
@@ -127,6 +128,13 @@ class ENote():
                 #To be on the safe side we always download notes when mtime does not match exactly
                 if long(os.path.getmtime(note_path)) == note.updated/1000L:
                     do_download = False
+
+            if note_path in files.keys():
+                sys.stderr.write('Warning: % already written, skipping.')
+                do_download = False
+
+            # Keep track of which files we download 
+            files[note_path] = do_download
 
             if do_download:
                 content = self.note_store.getNoteContent(self.token, note.guid)
