@@ -16,7 +16,7 @@ from evernote.edam.type.ttypes import NoteSortOrder
 
 from __init__ import __description__
 from auth import ENoteAuth
-from tools import enmltotxt
+from tools import enmltotxt, clean_filename
 
 class ENote():
     def __init__(self, token, path):
@@ -117,11 +117,11 @@ class ENote():
         for note in self.notes:
             notebook = self.notebooks[note.notebookGuid]
             #TODO: Strip special characters
-            notebook_dir = os.path.join(self.path, notebook)
+            notebook_dir = os.path.join(self.path, clean_filename(notebook))
             if not os.path.isdir(notebook_dir):
                 os.mkdir(notebook_dir)
 
-            note_path = os.path.join(notebook_dir, note.title + '.txt')
+            note_path = os.path.join(notebook_dir, clean_filename(note.title) + '.txt')
             do_download = True
             if incremental:
                 #To be on the safe side we always download notes when mtime does not match exactly

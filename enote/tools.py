@@ -13,3 +13,7 @@ def htmltotxt(content):
 
 def enmltotxt(content):
     return htmltotxt(enmltohtml(content))
+
+def clean_filename(text):
+    allowed = ' _-.()æøåÆØÅ%s%s'%(string.letters, string.digits)
+    return ''.join([c for c in text if c in allowed])
