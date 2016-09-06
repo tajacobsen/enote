@@ -131,6 +131,10 @@ class ENote():
                 #To be on the safe side we always download notes when mtime does not match exactly
                 if long(os.path.getmtime(note_path)) == note.updated/1000L:
                     do_download = False
+                elif long(os.path.getmtime(note_path)) > note.updated/1000L:
+                    sys.stderr.write('Warning: \"%s\" is newer than corresponding note, skipping.'%(note_path,))
+                    sys.stderr.write('\n')
+                    do_download = False
 
             if note_path in files.keys():
                 sys.stderr.write('Warning: \"%s\" already written, skipping.'%(note_path,))
@@ -145,7 +149,6 @@ class ENote():
                 content = enmltotxt(content)
 
                 f = io.open(note_path, 'w')
-                #FIXME: Next line can give an error in some cases
                 f.write(unicode(content))
                 f.write(u'\n')
                 f.close()
