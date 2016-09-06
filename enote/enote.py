@@ -119,15 +119,15 @@ class ENote():
         self.pullNotes(notebook, tags)
         files = {}
         for note in self.notes:
-            notebook = self.notebooks[note.notebookGuid]
+            notebook_name = self.notebooks[note.notebookGuid]
             #TODO: Strip special characters
-            notebook_dir = os.path.join(self.path, clean_filename(notebook))
+            notebook_dir = os.path.join(self.path, clean_filename(notebook_name))
             if not os.path.isdir(notebook_dir):
                 os.mkdir(notebook_dir)
 
             note_path = os.path.join(notebook_dir, clean_filename(note.title) + '.txt')
             do_download = True
-            if incremental:
+            if incremental and os.path.isfile(note_path):
                 #To be on the safe side we always download notes when mtime does not match exactly
                 if long(os.path.getmtime(note_path)) == note.updated/1000L:
                     do_download = False
@@ -155,9 +155,23 @@ class ENote():
 
                 os.utime(note_path, (-1, note.updated/1000L))
 
-        #TODO: implement --delete
         if delete:
-            pass
+            if notebook is None:
+                notebook_names = [clean_filename(n) for n in self.notebooks.values()]
+            else:
+                notebook_names = [clean_filename(notebook)]
+
+            dirs = [d for d in os.listdir(self.path) if os.path.isdir(d)]
+            for d in dirs:
+                # Only touch files in directories corresponding to notebooks in current search
+                if d in notebook_names:
+                    files_in_dir = [os.path.join(self.path, d, f) \
+                            for f in os.listdir(os.path.join(self.path, d)) \
+                            if os.path.isfile(os.path.join(self.path, d, f))]
+                    for f in files_in_dir:
+                        if not f in files:
+                            sys.stderr.write('Warning: Deleting \"%s\"\n'%(f,))
+                            os.remove(f)
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
@@ -226,9 +240,6 @@ def main():
         enote.printNotes(args.notebook, tags)
 
     if command == 'download':
-        if args.delete:
-            raise NotImplementedError('--delete not implemented')
-
         if args.tags is not None:
             tags = args.tags.split(',')
         else:
