@@ -9,6 +9,7 @@ Installation
 ## Dependencies (FreeBSD pkg names):
 * py27-evernote
 * py27-html2text
+* py27-beautifulsoup
 
 Usage
 =====

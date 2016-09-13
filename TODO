@@ -1,5 +1,4 @@
 TODO:
-- get rid of "print"
 - error handling
 - make oauth work properly
 - turn checkboxes into [x] or [ ]
