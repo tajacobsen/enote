@@ -1,0 +1,4 @@
+#!/usr/bin/env python2
+
+from enote import enote
+enote.main()
