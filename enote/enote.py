@@ -10,7 +10,6 @@ SANDBOX = False
 
 import os
 import io
-import pickle
 import argparse
 
 #FIXME: Workaround (see tools.py for description)
@@ -180,6 +179,9 @@ class ENote():
 
 def main():
     parser = argparse.ArgumentParser(prog='enote', description=__description__)            
+    parser.add_argument('--path', type=str)
+    parser.add_argument('--config', type=str)
+
     subparser = parser.add_subparsers(dest='command')
 
     # init command
@@ -207,14 +209,19 @@ def main():
     command = args.command
 
     path = os.getcwd()
+    if args.path is not None:
+        path = args.path
+
     config_file = os.path.join(path, '.enote')
+    if args.config is not None:
+        config_file = args.config
 
     if command == 'init':
-        enauth = ENoteAuth() 
+        enauth = ENoteAuth()
         token = enauth.get_token()
         #TODO: This will wipe the file. If we store other variables in the future, need to find different way
-        f = io.open(config_file, 'wb')
-        pickle.dump(token, f)
+        f = io.open(config_file, 'w')
+        f.write(u"%s\n"%(token,))
         f.close()
         sys.exit(0)
 
@@ -224,8 +231,8 @@ def main():
         sys.stderr.write('\n')
         sys.exit(1)
 
-    f = io.open(config_file, 'rb')
-    token = pickle.load(f)
+    f = io.open(config_file, 'r')
+    token = f.readline().strip("\n")
     f.close()
 
     enote = ENote(token, path)
