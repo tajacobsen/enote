@@ -12,9 +12,7 @@ import os
 import io
 import argparse
 
-#FIXME: Workaround (see tools.py for description)
-#from evernote.api.client import EvernoteClient
-from tools import ENEvernoteClient as EvernoteClient
+from evernote.api.client import EvernoteClient
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from evernote.edam.type.ttypes import NoteSortOrder
 
