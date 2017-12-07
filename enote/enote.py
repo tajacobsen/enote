@@ -225,7 +225,7 @@ def main():
         f.close()
         sys.exit(0)
 
-    if not os.path.isfile(os.path.join(path, '.enote')):
+    if args.config is None and not os.path.isfile(os.path.join(path, '.enote')):
         #TODO: write to stderr
         sys.stderr.write('Error: Directory not initialized')
         sys.stderr.write('\n')
