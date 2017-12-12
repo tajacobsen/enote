@@ -92,6 +92,17 @@ def ENMLToText(content, pretty=True, header=True, **kwargs):
     :type media_fiter: callable object with prototype: `bool func(hash_str, mime_type)`
     """
     html = ENMLToHTML(content, pretty, header)
+    
+    #Turn checkboxes into text
+    soup = BeautifulSoup(html, "html.parser")
+    todos = soup.find_all("input", type="checkbox")
+    for todo in todos:
+        if todo["checked"] == "true":
+            todo.replace_with("[x]")
+        else:
+            todo.replace_with("[ ]")
+    html = soup.prettify().encode("utf-8")
+
     text = str(html2text.html2text(html.decode('utf-8')))
     for entity, replacement in REPLACEMENTS:
         text = text.replace(entity, replacement)

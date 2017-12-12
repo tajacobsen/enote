@@ -81,10 +81,10 @@ def main():
                 f.write("\n")
                 f.close()
                 
-                #os.utime(note_path, (-1, note.updated/1000))
+                os.utime(note_path, (-1, note.updated/1000))
 
         #TODO: Delete unneeded files
-        sys.exit(0)
+        sys.exit(0) #DEBIG
 
 if __name__ == "__main__":
     main()
