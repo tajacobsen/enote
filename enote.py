@@ -62,8 +62,10 @@ def main():
             )
 
         notes = note_store.findNotesMetadata(token, note_filter, offset, max_notes, result_spec).notes
+        files_in_notebook = []
         for note in notes:
             note_path = os.path.join(notebook_dir, clean_filename(note.title) + ".txt")
+            files_in_notebook.append(note_path)
             do_download = True
             if os.path.isfile(note_path):
                 if os.path.getmtime(note_path) == note.updated/1000:
@@ -83,7 +85,12 @@ def main():
                 
                 os.utime(note_path, (-1, note.updated/1000))
 
-        #TODO: Delete unneeded files
+        for f in os.listdir(notebook_dir):
+            f_path = os.path.join(notebook_dir, f)
+            if os.path.isfile(f_path) and not f_path in files_in_notebook:
+                print('Warning: Deleting \"{}\"'.format(f_path))
+                os.remove(f_path)
+
         sys.exit(0) #DEBIG
 
 if __name__ == "__main__":
