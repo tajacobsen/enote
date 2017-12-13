@@ -2,8 +2,6 @@
 
 SANDBOX = False
 
-import sys #DEBUG
-
 import os, io
 import argparse
 import re
@@ -54,7 +52,6 @@ def main():
         #TODO: Figure out a way to know if more than 250 notes exist in notebook and handle accordingly
         offset = 0
         max_notes = 250
-        max_notes = 2 #DEBUG
 
         result_spec = NotesMetadataResultSpec(
             includeTitle=True,
@@ -74,7 +71,6 @@ def main():
             if do_download:
                 media_store = enml.FileMediaStore(note_store, note.guid, os.path.join(notebook_dir, clean_filename(note.title)))
                 content = note_store.getNoteContent(token, note.guid)
-                #TODO: download and save ref. data
                 content = enml.ENMLToText(content, media_store=media_store)
                 content = content.strip("\n")
                 content = re.sub(r"\n{2,}","\n", content)
@@ -87,12 +83,11 @@ def main():
                 os.utime(note_path, (-1, note.updated/1000))
 
         for f in os.listdir(notebook_dir):
+            #TODO: Also delete resource directories
             f_path = os.path.join(notebook_dir, f)
             if os.path.isfile(f_path) and not f_path in files_in_notebook:
                 print('Warning: Deleting \"{}\"'.format(f_path))
                 os.remove(f_path)
-
-        sys.exit(0) #DEBIG
 
 if __name__ == "__main__":
     main()
