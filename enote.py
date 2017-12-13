@@ -72,9 +72,10 @@ def main():
                     do_download = False
              
             if do_download:
+                media_store = enml.FileMediaStore(note_store, note.guid, os.path.join(notebook_dir, clean_filename(note.title)))
                 content = note_store.getNoteContent(token, note.guid)
                 #TODO: download and save ref. data
-                content = enml.ENMLToText(content)
+                content = enml.ENMLToText(content, media_store=media_store)
                 content = content.strip("\n")
                 content = re.sub(r"\n{2,}","\n", content)
 

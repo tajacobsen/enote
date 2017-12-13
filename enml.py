@@ -3,6 +3,8 @@
 import os
 from bs4 import BeautifulSoup
 import html2text
+import binascii
+
 MIME_TO_EXTESION_MAPPING = {
     'image/png': '.png',
     'image/jpg': '.jpg',
@@ -91,7 +93,7 @@ def ENMLToText(content, pretty=True, header=True, **kwargs):
     Returns True if the resource must be kept in HTML, False otherwise.
     :type media_fiter: callable object with prototype: `bool func(hash_str, mime_type)`
     """
-    html = ENMLToHTML(content, pretty, header)
+    html = ENMLToHTML(content, pretty, header, **kwargs)
     
     #Turn checkboxes into text
     soup = BeautifulSoup(html, "html.parser")
@@ -121,7 +123,8 @@ class MediaStore(object):
         """
         get resource by its hash
         """
-        hash_bin = hash_str.decode('hex')
+        #hash_bin = hash_str.decode('hex')
+        hash_bin = binascii.unhexlify(hash_str)
         resource = self.note_store.getResourceByHash(self.note_guid, hash_bin, True, False, False);
         return resource.data.body
 
@@ -146,7 +149,7 @@ class FileMediaStore(MediaStore):
             os.makedirs(self.path)
         data = self._get_resource_by_hash(hash_str)
         file_path = self.path + '/'  + hash_str + MIME_TO_EXTESION_MAPPING[mime_type]
-        f = open(file_path, "w")
+        f = open(file_path, "bw")
         f.write(data)
         f.close()
         return "file://" + file_path
